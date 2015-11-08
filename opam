@@ -1,0 +1,21 @@
+opam-version: "1.2"
+name: "ocaml-netralys"
+version: "0.1"
+authors: "Johan Mazel"
+maintainer: "johan.mazel@gmail.com"
+license: "GPL3"
+homepage: "https://github.com/johanmazel/ocaml-netralys"
+dev-repo: "https://github.com/johanmazel/ocaml-netralys.git"
+bug-reports: "https://github.com/johanmazel/ocaml-netralys/issues"
+build: [
+  ["oasis" "setup"]
+  ["ocaml" "setup.ml" "-configure"]
+  ["ocaml" "setup.ml" "-build"]
+]
+install: [
+  ["ocaml" "setup.ml" "-install"]
+]
+remove: [["ocamlfind" "remove" "admd"]]
+#depends: [
+#  "ocamlfind" {>= "1.5.3"}
+#]
