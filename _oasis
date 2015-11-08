@@ -28,6 +28,7 @@ Library netralys_trace_parsing
                  cstruct,
                  pcap-format,
                  threads,
+
                  jl
 
 Library netralys_packet_data
@@ -48,13 +49,14 @@ Library netralys_packet_data
   BuildDepends:  
                  ipaddr,
                  bitstring,
-                 threads,
+
                  comparelib,
                  comparelib.syntax,
                  sexplib,
                  sexplib.syntax,
                  bin_prot,
                  bin_prot.syntax,
+
                  robinet_parsing,
                  admd,
                  netralys_trace_parsing
@@ -64,17 +66,18 @@ Library netralys_flow
   Findlibname:   netralys_flow
   Modules:       Five_tuple_flow,
                  Five_tuple_flow_data_structures,
-#                 Traffic_flow_aggr_data_instantiations,
                  Traffic_flow_key_type
   BuildDepends:  
                  batteries,
                  ipaddr,
+
                  comparelib,
                  comparelib.syntax,
                  sexplib,
                  sexplib.syntax,
                  bin_prot,
                  bin_prot.syntax,
+
                  jl,
                  netralys_packet_data,
                  netralys_trace_parsing
@@ -110,6 +113,7 @@ Library netralys_metrics
                  Icmp_icmp_metrics
   BuildDepends:  
                  gsl,
+
                  netralys_packet_data,
                  netralys_flow
 
@@ -142,12 +146,14 @@ Library netralys_ipaddr_container
                  ipaddr,
                  uint,
                  gsl,
+
                  comparelib,
                  comparelib.syntax,
                  sexplib,
                  sexplib.syntax,
                  bin_prot,
                  bin_prot.syntax,
+
                  jl,
                  netralys_packet_data
 
