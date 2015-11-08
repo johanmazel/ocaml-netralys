@@ -1,0 +1,156 @@
+OASISFormat: 0.3
+Name:        netralys
+Version:     0.1
+Synopsis:    An OCaml library for network traffic analysis.
+Authors:     Johan Mazel
+License:     GPL-3
+Plugins:     META (0.3), StdFiles (0.3)
+BuildTools:  ocamlbuild
+
+Library netralys_trace_parsing
+  Path:          lib/trace_parsing
+  Findlibname:   netralys_trace_parsing
+  Modules:       Pcap_timeval,
+                 Pcap_header,
+                 Trace_statistics,
+                 Melange_wrapper,
+                 Cstruct_pcap_wrapper,
+                 Trace_handler,
+                 Mpl_stdlib,
+                 Pcap_entry,
+                 Ethernet,
+                 Ipv4,
+                 Tcp,
+                 Udp,
+                 Icmp,
+                 Icmp6
+  BuildDepends:  
+                 cstruct,
+                 pcap-format,
+                 threads,
+                 jl
+
+Library netralys_packet_data
+  Path:          lib/packet_data
+  Findlibname:   netralys_packet_data
+  Modules:       Packet_parsing_mode,
+                 Packet_data_for_metrics,
+                 Ipv4_data_for_metrics,
+                 Ipv6_data_for_metrics,
+                 Transport_protocol_for_metrics,
+                 Tcp_data_for_metrics,
+                 Udp_data_for_metrics,
+                 Icmp_data_for_metrics,
+                 Icmp6_data_for_metrics,
+                 Icmp_transport_layer_data_for_metrics,
+                 Icmp_tcp_data_for_metrics,
+                 Icmp_icmp_data_for_metrics
+  BuildDepends:  
+                 ipaddr,
+                 bitstring,
+                 threads,
+                 comparelib,
+                 comparelib.syntax,
+                 sexplib,
+                 sexplib.syntax,
+                 bin_prot,
+                 bin_prot.syntax,
+                 robinet_parsing,
+                 admd,
+                 netralys_trace_parsing
+
+Library netralys_flow
+  Path:          lib/flow
+  Findlibname:   netralys_flow
+  Modules:       Five_tuple_flow,
+                 Five_tuple_flow_data_structures,
+#                 Traffic_flow_aggr_data_instantiations,
+                 Traffic_flow_key_type
+  BuildDepends:  
+                 batteries,
+                 ipaddr,
+                 comparelib,
+                 comparelib.syntax,
+                 sexplib,
+                 sexplib.syntax,
+                 bin_prot,
+                 bin_prot.syntax,
+                 jl,
+                 netralys_packet_data,
+                 netralys_trace_parsing
+
+Library netralys_metrics
+  Path:          lib/metrics
+  Findlibname:   netralys_metrics
+  Modules:       
+                 Key_occurrence_distribution,
+                 Key_occurrence_distribution_instantiations,
+                 Packet_fingerprint,
+
+                 Five_tuple_flow_ipv6_metrics,
+                 Five_tuple_flow_transport_layer_metrics,
+                 Five_tuple_flow_tcp_metrics,
+                 Five_tuple_flow_udp_metrics,
+                 Five_tuple_flow_gre_metrics,
+
+                 Detailed_metrics,
+                 Network_traffic_metric_instantiations,
+                 Five_tuple_flow_metrics,
+                 Ipv6_metrics,
+                 Tcp_metrics,
+                 Udp_metrics,
+                 Gre_metrics,
+                 Icmp_metrics,
+                 Icmpv6_metrics,
+                 Icmp_du_metrics,
+                 Icmp_te_metrics,
+                 Icmp_rm_metrics,
+                 Icmp_encapsulated_metrics,
+                 Icmp_tcp_metrics,
+                 Icmp_icmp_metrics
+  BuildDepends:  
+                 gsl,
+                 netralys_packet_data,
+                 netralys_flow
+
+Library netralys_attribute_value
+  Path:          lib/attribute_value
+  Findlibname:   netralys_attribute_value
+  Modules:       
+                 Value_variant,
+                 Feature_name_container,
+                 Network_traffic_attributes,
+                 Network_traffic_values
+  BuildDepends:  
+                 netralys_packet_data,
+                 netralys_metrics,
+                 netralys_flow
+
+
+Library netralys_ipaddr_container
+  Path:          lib/ipaddr_container
+  Findlibname:   netralys_ipaddr_container
+  Modules:       
+                 Uint128_custom,
+                 Ip_address_data_structures,
+                 Ip_address_data_structures_instantiations,
+                 Ip_address_container,
+                 Ip_address_container_compact,
+                 Ip_address_special_container,
+                 Ipaddr_prefix_utils
+  BuildDepends:  
+                 ipaddr,
+                 uint,
+                 gsl,
+                 comparelib,
+                 comparelib.syntax,
+                 sexplib,
+                 sexplib.syntax,
+                 bin_prot,
+                 bin_prot.syntax,
+                 jl,
+                 netralys_packet_data
+
+
+
+
