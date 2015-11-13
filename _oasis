@@ -125,6 +125,7 @@ Library netralys_attribute_value
                  Network_traffic_attributes,
                  Network_traffic_values
   BuildDepends:  
+                 jl,
                  netralys_packet_data,
                  netralys_metrics,
                  netralys_flow
