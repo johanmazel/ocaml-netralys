@@ -33,5 +33,5 @@ depends: [
 
   "jl"
   "robinet_parsing"
-  "admd"
+  "ocaml-admd"
 ]
