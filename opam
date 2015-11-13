@@ -16,14 +16,13 @@ install: [
   ["ocaml" "setup.ml" "-install"]
 ]
 remove: [
-["ocamlfind" "remove" "netralys_trace_parsing"]
-["ocamlfind" "remove" "netralys_packet_data"]
-["ocamlfind" "remove" "netralys_flow"]
-["ocamlfind" "remove" "netralys_metrics"]
-["ocamlfind" "remove" "netralys_attribute_value"]
-["ocamlfind" "remove" "netralys_ipaddr_container"]
+  ["ocamlfind" "remove" "netralys_trace_parsing"]
+  ["ocamlfind" "remove" "netralys_packet_data"]
+  ["ocamlfind" "remove" "netralys_flow"]
+  ["ocamlfind" "remove" "netralys_metrics"]
+  ["ocamlfind" "remove" "netralys_attribute_value"]
+  ["ocamlfind" "remove" "netralys_ipaddr_container"]
 ]
-
 #depends: [
 #  "ocamlfind" {>= "1.5.3"}
 #]
