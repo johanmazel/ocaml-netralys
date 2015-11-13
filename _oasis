@@ -121,7 +121,6 @@ Library netralys_attribute_value
   Path:          lib/attribute_value
   Findlibname:   netralys_attribute_value
   Modules:       
-                 Value_variant,
                  Feature_name_container,
                  Network_traffic_attributes,
                  Network_traffic_values
