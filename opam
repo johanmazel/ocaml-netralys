@@ -31,7 +31,7 @@ depends: [
   "uint"
   "gsl"
 
-  "jl"
-  "robinet_parsing"
+  "ocaml-jl"
+  "ocaml-robinet_parsing"
   "ocaml-admd"
 ]
