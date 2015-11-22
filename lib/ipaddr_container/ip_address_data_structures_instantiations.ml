@@ -64,6 +64,7 @@ module Prefix_V4 = struct
   let network_address = Ipaddr.V4.Prefix.network_address
   let network = Ipaddr.V4.Prefix.network
   let broadcast = Ipaddr.V4.Prefix.broadcast
+  let mem = Ipaddr.V4.Prefix.mem
   let max_size = 32
 end
 
@@ -183,6 +184,7 @@ module Prefix_V6 = struct
   let network_address = Ipaddr.V6.Prefix.network_address
   let network = Ipaddr.V6.Prefix.network
   let broadcast _ = Ipaddr.V6.of_int32 (Int32.max_int, Int32.max_int, Int32.max_int, Int32.max_int)
+  let mem = Ipaddr.V6.Prefix.mem
   let max_size = 128
 end
 
