@@ -64,6 +64,24 @@ let length t =
   | V4 container -> Ip_address_data_structures_V4.Container.length container
   | V6 container -> Ip_address_data_structures_V6.Container.length container
 
+let filter_prefix prefix t =
+  match t with
+  | Empty -> raise (Invalid_argument "[Ip_address_container]: filter_prefix: Empty")
+  | V4 container -> 
+    let prefix_v4 =
+      match prefix with
+      | Ipaddr.V4 a -> a
+      | Ipaddr.V6 a -> raise (Invalid_argument "[Ip_address_container]: coverage_in_prefix: IPv6 prefix provided to IPv4 container")
+    in
+    V4 (Ip_address_data_structures_V4.Container.filter_prefix prefix_v4 container)
+  | V6 container ->
+    let prefix_v6 =
+      match prefix with
+      | Ipaddr.V4 a -> raise (Invalid_argument "[Ip_address_container]: coverage_in_prefix: IPv4 prefix provided to IPv6 container")
+      | Ipaddr.V6 a -> a
+    in
+    V6 (Ip_address_data_structures_V6.Container.filter_prefix prefix_v6 container)
+
 let prefix t =
   match t with
   | Empty -> raise (Invalid_argument "[Ip_address_container]: prefix: Empty")

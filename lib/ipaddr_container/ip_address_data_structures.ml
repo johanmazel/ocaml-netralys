@@ -105,9 +105,12 @@ module type PREFIX = sig
   val to_string : t -> string
   val make : int -> Ip_address.t -> t
   val bits : t -> int
+  val bits : t -> int
   val network_address : t -> Ip_address.t -> Ip_address.t
   val network : t -> Ip_address.t
   val broadcast : t -> Ip_address.t
+  val mem : Ip_address.t -> t -> bool
+    
   val max_size : int
 
 end
@@ -238,7 +241,7 @@ struct
 
     let size t =
       let bits = Prefix.bits t in
-      let prefix_size = 2. ** (float_of_int (32 - bits)) in
+      let prefix_size = 2. ** (float_of_int (Prefix.max_size - bits)) in
       prefix_size
 
     let rec common_netmask_between_ipaddr ipaddr1 ipaddr2 netmask =
@@ -694,13 +697,16 @@ struct
         t.data
         acc
 
-    let filter
-        f
+    let filter_prefix
+        prefix
         t
       =
       new_t
         (Unsigned_int_set.filter
-           f
+           (fun uint ->
+              let ip_address = Ip_address.of_unsigned_int uint in
+              Prefix.mem ip_address prefix
+           )
            t.data
         )
         
