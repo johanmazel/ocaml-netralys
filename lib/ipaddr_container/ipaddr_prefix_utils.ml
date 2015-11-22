@@ -25,7 +25,7 @@ let bits t =
 let size t =
   match t with
   | Ipaddr.V4 prefixv4 -> Ip_address_data_structures_V4.Prefix_utils.size prefixv4
-  | Ipaddr.V6 prefixv6 -> Ip_address_data_structures_V4.Prefix_utils.size prefixv6
+  | Ipaddr.V6 prefixv6 -> Ip_address_data_structures_V6.Prefix_utils.size prefixv6
 
 let prefix_distance t1 t2 =
   match t1,t2 with
