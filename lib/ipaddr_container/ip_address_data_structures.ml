@@ -459,16 +459,6 @@ struct
         in
 
         let isolated_list = A.to_list t.isolated in
-        (* let isolated_string_list = *)
-        (*   L.map *)
-        (*     bin_int_to_ipaddr *)
-        (*     isolated_list *)
-        (* in *)
-        (* let isolated_string = *)
-        (*   List_ext.to_string *)
-        (*     (fun string -> string) *)
-        (*     isolated_string_list *)
-        (* in *)
         let isolated_string =
           Bin_int_set.to_string
             ~sep: " "
@@ -699,6 +689,16 @@ struct
         t.data
         acc
 
+    let filter
+        f
+        t
+      =
+      new_t
+        (Unsigned_int_set.filter
+           f
+           t.data
+        )
+        
     let iter
         f
         t
@@ -1475,24 +1475,6 @@ struct
            )
            (Int_core_ht.to_alist t.element_subset_set_h)
         )
-        (* (Utils_batteries.to_string_hashtbl *)
-        (*    ~sep_element: " ; " *)
-        (*    ~to_string_key: string_of_int *)
-        (*    to_string_bin_int_set *)
-        (*    (BatHashtbl.of_enum (L.enum (Int_core_ht.to_alist t.subset_h))) *)
-        (* ) *)
-        (* (Utils_batteries.to_string_hashtbl *)
-        (*    ~sep_element: " ; " *)
-        (*    ~to_string_key: string_of_int *)
-        (*    to_string_int_set *)
-        (*    (BatHashtbl.of_enum (L.enum (Int_core_ht.to_alist t.subset_element_set_h))) *)
-        (* ) *)
-        (* (Utils_batteries.to_string_hashtbl *)
-        (*    ~sep_element: " ; " *)
-        (*    ~to_string_key: string_of_int *)
-        (*    to_string_int_set *)
-        (*    (BatHashtbl.of_enum (L.enum (Int_core_ht.to_alist t.element_subset_set_h))) *)
-        (* ) *)
 
     let remove_subset_indice
         t
