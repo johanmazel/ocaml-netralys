@@ -242,7 +242,7 @@ struct
     let size t =
       let bits = Prefix.bits t in
       let prefix_size = 2. ** (float_of_int (Prefix.max_size - bits)) in
-      prefix_size
+      int_of_float prefix_size
 
     let rec common_netmask_between_ipaddr ipaddr1 ipaddr2 netmask =
       match netmask with
