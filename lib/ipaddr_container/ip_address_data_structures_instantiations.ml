@@ -48,6 +48,10 @@ module Ip_address_V4 = struct
   let null = Ipaddr.V4.of_int32 (Int32.zero)
   let of_bin_int int32 = Ipaddr.V4.of_int32 int32
   let of_unsigned_int uint32 = Ipaddr.V4.of_int32 (Uint32.to_int32 uint32)
+      
+  let to_bin_int t = Ipaddr.V4.to_int32 t
+  let to_unsigned_int t = Uint32.of_int32 (Ipaddr.V4.to_int32 t)
+      
   let to_string = Ipaddr.V4.to_string
   let to_ipaddr t = Ipaddr.V4 t      
 end
@@ -168,6 +172,26 @@ module Ip_address_V6 = struct
       )      
   let of_unsigned_int uint128 =
     Ipaddr.V6.of_int32 (Uint128_custom.to_int32s uint128)
+      
+  let to_bin_int
+      t
+    =
+    let a, b, c,d = Ipaddr.V6.to_int32 t in
+    Unsigned_int.to_bin_int
+      (Uint128_custom.of_int32s
+         a
+         b
+         c
+         d
+      )      
+  let to_unsigned_int t =
+    let a, b, c,d = Ipaddr.V6.to_int32 t in
+    Uint128_custom.of_int32s
+         a
+         b
+         c
+         d
+      
   let to_string ip_address = Ipaddr.V6.to_string ~v4: false ip_address
   let to_ipaddr t = Ipaddr.V6 t
 end
