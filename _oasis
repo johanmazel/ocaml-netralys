@@ -141,6 +141,7 @@ Library netralys_ipaddr_container
                  Ip_address_container,
                  Ip_address_container_compact,
                  Ip_address_special_container,
+                 Ip_address_sequence,
                  Ipaddr_prefix_utils
   BuildDepends:  
                  ipaddr,

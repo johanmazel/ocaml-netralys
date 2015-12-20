@@ -1,9 +1,8 @@
 
 open Printf
 
-module A = BatArray
+module A = Array_ext
 module DA = BatDynArray
-(* module HT = Lhashtbl *)
 module HT = BatHashtbl
 module L = BatList
 
@@ -87,6 +86,9 @@ module type IP_ADDRESS = sig
   val null : t
   val of_bin_int : Bin_int.t -> t
   val of_unsigned_int : Unsigned_int.t -> t
+    
+  val to_bin_int : t -> Bin_int.t
+  val to_unsigned_int : t -> Unsigned_int.t
 
   val compare : t -> t -> int
   val to_string : t -> string
@@ -371,6 +373,61 @@ struct
 
   end
 
+  module Sequence = struct
+
+    type t =
+      {
+        mutable a : Bin_int.t array;
+      }
+    with compare, sexp, bin_io
+
+    let new_t
+        a
+      =
+      {
+        a;
+      }
+
+    let new_empty_t _ =
+      new_t
+        [| |]
+
+    let to_string t =
+      (
+        let bin_int_to_ipaddr bin_int =
+          Ip_address.to_string
+            (Ip_address.of_bin_int
+               bin_int
+            )
+        in
+
+        let string =
+          A.to_string
+            ~sep: " "
+            bin_int_to_ipaddr
+            t.a
+        in
+
+        string
+      )
+
+    let length t =
+      A.length t.a
+
+    let to_ipaddr_array t =
+      A.map
+        Ip_address.of_bin_int
+        t.a
+      
+    let of_ipaddr_array a =
+      new_t
+        (A.map
+           Ip_address.to_bin_int
+           a
+        )
+      
+  end
+  
   module Container_compact = struct
 
     type t =
