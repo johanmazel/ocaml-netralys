@@ -76,7 +76,14 @@ module Make = functor (Key : KEY) -> struct
 
     let find t key =
       Core.Std.Hashtbl.Poly.find_exn t.hashtable key
-        
+
+    let map f t =
+      new_t
+        (Core.Std.Hashtbl.Poly.map
+           t.hashtable
+           f
+        )
+    
     let add t key value = Core.Std.Hashtbl.Poly.add_exn t.hashtable key value
     let replace t key value = Core.Std.Hashtbl.Poly.replace t.hashtable key value
     let modify t key f =
@@ -191,6 +198,11 @@ module Make = functor (Key : KEY) -> struct
     
     type t = float Container.t
 
+    let map f t =
+      Container.map
+        f
+        t
+      
     let add_occurrence
         t 
         key
@@ -300,6 +312,7 @@ module Make = functor (Key : KEY) -> struct
 
   end
 
+  (* TODO: rename functions with get_ *)
   module C = struct
   
     type t =
@@ -842,7 +855,7 @@ module Make = functor (Key : KEY) -> struct
           (*      (Container.bindings *)
           (*         t *)
           (*      ) *)
-          (*   ) *)
+          (* ) *)
           Container.fold
             (fun key occurrence array_acc ->
                let a = A.make occurrence (Key.to_float key) in
@@ -917,7 +930,7 @@ module Make = functor (Key : KEY) -> struct
         (*          ) *)
         (*       ); *)
         (*     assert(false) *)
-        (*   ); *)
+        (* ); *)
 
         let ad_array =
           A.map
@@ -926,7 +939,7 @@ module Make = functor (Key : KEY) -> struct
             )
             array_sorted
         in
-                
+
         let ad_array1 =
           Bigarray.Array1.of_array
             Bigarray.float64
@@ -940,7 +953,7 @@ module Make = functor (Key : KEY) -> struct
           array1_to_array
             ad_array1
         in
-        
+
         let mad =
           Gsl.Stats.quantile_from_sorted_data
             ad_array_sorted
@@ -1103,740 +1116,760 @@ module Make = functor (Key : KEY) -> struct
           /.
           (float_of_int (Key_set.cardinal union))
 
-  let simpson t =
-    let total_nb_occurrence_float = float_of_int (get_total_nb_occurrence t) in
-    (* let element_in_set_probability = 1. /. total_nb_occurrence_float in *)
+    let simpson t =
+      let total_nb_occurrence_float = float_of_int (get_total_nb_occurrence t) in
+      (* let element_in_set_probability = 1. /. total_nb_occurrence_float in *)
 
-    (* let simpson_after_set = *)
-    (*   (element_in_set_probability ** 2.) *. (float_of_int (Key_set.cardinal t.value_with_single_occurrence)) *)
-    (* in *)
-
-    let simpson_after_hashtable =
-      Container.fold
-        (fun key occurrence simpson_acc ->
-           let p = float_of_int occurrence /. total_nb_occurrence_float in
-           simpson_acc +. (p ** 2.)
-        )
-        t.value_container_hashtable
-        0.
-    in
-
-    simpson_after_hashtable
-
-  let compare
-      t1
-      t2
-    =
-    Container.compare
-      Batteries.Int.compare
-      t1.value_container_hashtable
-      t2.value_container_hashtable
-    
-  let is_valid t =
-    (
-      Container.fold
-        (fun key occurrence acc -> 
-           (occurrence > 0) && acc
-        )
-        t.value_container_hashtable
-        true
-    )
-
-  let log_2 = log 2.0
-  let log2 n = log n /. log_2
-
-  let logb b n = log n /. log b
-
-  let shannon_entropy_of_p_list l =
-    let n = L.length l in
-    let histo = A.of_list l in
-    if n = 0 then
-      0.0
-    else
-      let rec loop sum ix =
-        if ix < 0 then sum
-        else
-          let freq = histo.(ix) in
-          if freq = 0. then loop sum (ix - 1)
-          else
-            let ffreq = freq in
-            loop (sum +. ffreq *. log ffreq) (ix - 1) in
-      let sum = loop 0.0 (Array.length histo - 1) in
-      let f_n = float n in
-      sum /. f_n
-
-  (* http://www.gnu-darwin.org/www001/src/ports/devel/aifad/work/aifad-1.0.27/src/entropy_utils.ml *)
-  let shannon_entropy t =
-    let n = get_total_nb_occurrence t in
-    let histo = A.of_list (L.map snd (bindings t)) in
-    if n = 0 then
-      0.0
-    else
-      let rec loop sum ix =
-        if ix < 0 then sum
-        else
-          let freq = histo.(ix) in
-          if freq = 0 then loop sum (ix - 1)
-          else
-            let ffreq = float freq in
-            loop (sum +. ffreq *. log ffreq) (ix - 1) in
-      let sum = loop 0.0 (Array.length histo - 1) in
-      let f_n = float n in
-      (* ((log2 f_n -. sum) /. f_n) /. log_2 *)
-      log2 f_n -. ((sum /. f_n) /. log_2)
-
-  let shannon_entropy_normalized t =
-    let keys = keys t in
-    let keys_length = L.length keys in
-    assert(keys_length > 0);
-    let value =
-      if keys_length = 1 then
-        0.
-      else
-        (shannon_entropy t)
-        /.
-        (log2 (float_of_int (keys_length)))
-    in
-
-    value
-
-  let shannon_entropy_float_list l =
-    let n =
-      L.fold_left
-        (fun acc (_, occurrence) -> acc +. occurrence)
-        0.
-        l
-    in
-    let histo = A.of_list (L.map snd l) in
-    if n = 0. then
-      0.0
-    else
-      let rec loop sum ix =
-        if ix < 0 then sum
-        else
-          let freq = histo.(ix) in
-          if freq = 0. then loop sum (ix - 1)
-          else
-            (* let ffreq = freq in *)
-            loop (sum +. freq *. log freq) (ix - 1) in
-      let sum = loop 0.0 (Array.length histo - 1) in
-      (* let f_n = float n in *)
-      (* ((log2 f_n -. sum) /. f_n) /. log_2 *)
-      log2 n -. ((sum /. n) /. log_2)
-
-  let shannon_entropy_normalized_float_list l =
-    let length = L.length l in
-    assert(length > 0);
-    let value =
-      if length = 1 then
-        0.
-      else
-        (shannon_entropy_float_list l)
-        /.
-        (log2 (float_of_int (length)))
-    in
-
-    (* print_endline *)
-    (*   (sprintf *)
-    (*          "Distribution_metric: shannon_entropy_normalized: %f:\n%s" *)
-    (*          value *)
-    (*          (to_string *)
-    (*             To_string_mode.Normal *)
-    (*             t *)
-    (*          ) *)
-    (*   ); *)
-
-    (* assert(value >= 0.); *)
-    (* assert(value <= 1.); *)
-
-    value
-
-  let kullback_leibler_old t1 t2 =
-    (
-      (* print_endline "Distribution_metric: kullback_leibler:
-         call"; *)
-
-      let keys_1 = keys t1 in
-      let keys_2 = keys t2 in
-
-      let total_nb_occurence_1 = get_total_nb_occurrence t1 in
-      let total_nb_occurence_2 = get_total_nb_occurrence t2 in
-
-      assert(total_nb_occurence_1 > 0);
-      assert(total_nb_occurence_2 > 0);
-
-      let keys = L.append keys_1 keys_2 in
-      let keys = L.unique 
-          ~eq: (fun k1 k2 -> Key.compare k1 k2 = 0)
-          keys 
-      in
-      (* let key_set = *)
-      (*         L.fold_right *)
-      (*           (fun key acc -> *)
-      (*             KeySet.add *)
-      (*               key *)
-      (*               acc *)
-      (*           ) *)
-      (*           keys *)
-      (*           KeySet.empty *)
+      (* let simpson_after_set = *)
+      (*   (element_in_set_probability ** 2.) *. (float_of_int (Key_set.cardinal t.value_with_single_occurrence)) *)
       (* in *)
 
-      let occurrence_1 =
-        L.map
-          (fun key ->
-             get_key_occurrence
-               key
-               t1
+      let simpson_after_hashtable =
+        Container.fold
+          (fun key occurrence simpson_acc ->
+             let p = float_of_int occurrence /. total_nb_occurrence_float in
+             simpson_acc +. (p ** 2.)
           )
-          keys
-      in
-      let occurrence_2 =
-        L.map
-          (fun key ->
-             get_key_occurrence
-               key
-               t2
-          )
-          keys
-      in
-
-      let ratio_1 =
-        L.map
-          (fun occurrence ->
-             let ratio =
-               (float_of_int occurrence) 
-               /.
-               (float_of_int total_nb_occurence_1)
-             in
-
-             assert((Batteries.Float.compare ratio nan) <> 0);
-
-             ratio
-          )
-          occurrence_1
-      in
-      let ratio_2 =
-        L.map
-          (fun occurrence ->
-             let ratio =
-               (float_of_int occurrence) 
-               /.
-               (float_of_int total_nb_occurence_2)
-             in
-
-             assert((Batteries.Float.compare ratio nan) <> 0);
-
-             ratio
-          )
-          occurrence_2
-      in
-
-      let kl_elements =
-        L.map2
-          (fun ratio_1 ratio_2 ->
-             let kl_1 =
-               if ratio_2 = 0. then
-                 0.
-               else
-               if ratio_1 = 0. then
-                 0.
-               else
-                 ratio_1 *. (log10 (ratio_1 /. ratio_2))
-             in
-
-             let kl_2 =
-               if ratio_1 = 0. then
-                 0.
-               else
-               if ratio_2 = 0. then
-                 0.
-               else
-                 ratio_2 *. (log10 (ratio_2 /. ratio_1))
-             in
-
-             kl_1 +. kl_2
-          )
-          ratio_1
-          ratio_2
-      in
-
-      let kl =
-        L.fold_right
-          (fun ratio acc -> ratio +. acc)
-          kl_elements
+          t.value_container_hashtable
           0.
       in
 
-      assert((Batteries.Float.compare kl nan) <> 0);
+      simpson_after_hashtable
 
-      (* print_endline "Distribution_metric: kullback_leibler: end"; *)
-
-      kl
-    )
-
-  let kullback_leibler_divergence t1 t2 =
-    (
-      (* print_endline "Distribution_metric: kullback_leibler: call"; *)
-
-      let keys_1 = keys t1 in
-      let keys_2 = keys t2 in
-
-      let total_nb_occurence_1 = get_total_nb_occurrence t1 in
-      let total_nb_occurence_2 = get_total_nb_occurrence t2 in
-
-      assert(total_nb_occurence_1 > 0);
-      assert(total_nb_occurence_2 > 0);
-
-      let keys = L.append keys_1 keys_2 in
-      let keys =
-        L.unique
-          ~eq: (fun k1 k2 -> Key.compare k1 k2 = 0)
-          keys
-      in
-
-      let occurrence_1 =
-        L.map
-          (fun key ->
-             get_key_occurrence
-               key
-               t1
+    let compare
+        t1
+        t2
+      =
+      Container.compare
+        Batteries.Int.compare
+        t1.value_container_hashtable
+        t2.value_container_hashtable
+    
+    let is_valid t =
+      (
+        Container.fold
+          (fun key occurrence acc -> 
+             (occurrence > 0) && acc
           )
-          keys
-      in
-      let occurrence_2 =
-        L.map
-          (fun key ->
-             get_key_occurrence
-               key
-               t2
-          )
-          keys
-      in
+          t.value_container_hashtable
+          true
+      )
 
-      let ratio_1 =
-        L.map
-          (fun occurrence ->
-             let ratio =
-               (float_of_int occurrence)
-               /.
-               (float_of_int total_nb_occurence_1)
-             in
+    let log_2 = log 2.0
+    let log2 n = log n /. log_2
 
-             assert((Batteries.Float.compare ratio nan) <> 0);
+    let logb b n = log n /. log b
 
-             (* print_endline *)
-             (*   (sprintf *)
-             (*          "ratio 1 %f" *)
-             (*          ratio *)
-             (*   ); *)
+    let shannon_entropy_of_p_list l =
+      let n = L.length l in
+      let histo = A.of_list l in
+      if n = 0 then
+        0.0
+      else
+        let rec loop sum ix =
+          if ix < 0 then sum
+          else
+            let freq = histo.(ix) in
+            if freq = 0. then loop sum (ix - 1)
+            else
+              let ffreq = freq in
+              loop (sum +. ffreq *. log ffreq) (ix - 1) in
+        let sum = loop 0.0 (Array.length histo - 1) in
+        let f_n = float n in
+        sum /. f_n
 
-             ratio
-          )
-          occurrence_1
-      in
-      let ratio_2 =
-        L.map
-          (fun occurrence ->
-             let ratio =
-               (float_of_int occurrence)
-               /.
-               (float_of_int total_nb_occurence_2)
-             in
+    (* http://www.gnu-darwin.org/www001/src/ports/devel/aifad/work/aifad-1.0.27/src/entropy_utils.ml *)
+    let shannon_entropy t =
+      let n = get_total_nb_occurrence t in
+      let histo = A.of_list (L.map snd (bindings t)) in
+      if n = 0 then
+        0.0
+      else
+        let rec loop sum ix =
+          if ix < 0 then sum
+          else
+            let freq = histo.(ix) in
+            if freq = 0 then loop sum (ix - 1)
+            else
+              let ffreq = float freq in
+              loop (sum +. ffreq *. log ffreq) (ix - 1) in
+        let sum = loop 0.0 (Array.length histo - 1) in
+        let f_n = float n in
+        (* ((log2 f_n -. sum) /. f_n) /. log_2 *)
+        log2 f_n -. ((sum /. f_n) /. log_2)
 
-             assert((Batteries.Float.compare ratio nan) <> 0);
-
-             (* print_endline *)
-             (*   (sprintf *)
-             (*          "ratio 2 %f" *)
-             (*          ratio *)
-             (*   ); *)
-
-             ratio
-          )
-          occurrence_2
-      in
-
-      let kl_elements =
-        L.map2
-          (fun ratio_1 ratio_2 ->
-             let value =
-               if ratio_2 = 0. then
-                 0.
-               else
-               if ratio_1 = 0. then
-                 0.
-               else
-                 ratio_1 *. (log2 (ratio_1 /. ratio_2))
-             in
-             (* print_endline *)
-             (*   (sprintf *)
-             (*          "value %f" *)
-             (*          value *)
-             (*   ); *)
-             value
-          )
-          ratio_1
-          ratio_2
-      in
-
-      let kl =
-        L.fold_right
-          (fun ratio acc -> ratio +. acc)
-          kl_elements
-          0.
-      in
-
-      assert((Batteries.Float.compare kl nan) <> 0);
-
-      (* print_endline "Distribution_metric: kullback_leibler: end"; *)
-
-      kl
-    )
-
-  let kullback_leibler_distance t1 t2 =
-    (
-      let kl1 = kullback_leibler_divergence t1 t2 in
-      let kl2 = kullback_leibler_divergence t2 t1 in
-
-      (* if kl1 < 0. then *)
-      (*   ( *)
-      (*         print_endline *)
-      (*           (sprintf *)
-      (*              "negative kl for:\n%s\n%s" *)
-      (*              (to_string To_string_mode.Normal t1) *)
-      (*              (to_string To_string_mode.Normal t2) *)
-      (*           ); *)
-      (*         assert(false) *)
-      (*   ); *)
-      (* if kl2 < 0. then *)
-      (*   ( *)
-      (*         print_endline *)
-      (*           (sprintf *)
-      (*              "negative kl for:\n%s\n%s" *)
-      (*              (to_string To_string_mode.Normal t2) *)
-      (*              (to_string To_string_mode.Normal t1) *)
-      (*           ); *)
-      (*         assert(false) *)
-      (*   ); *)
-      (* assert(kl1 >= 0.); *)
-      (* assert(kl2 >= 0.); *)
-
+    let shannon_entropy_normalized t =
+      let keys = keys t in
+      let keys_length = L.length keys in
+      assert(keys_length > 0);
       let value =
-        (kl1 +. kl2) /. 2.
+        if keys_length = 1 then
+          0.
+        else
+          (shannon_entropy t)
+          /.
+          (log2 (float_of_int (keys_length)))
       in
 
-      let value_old =
-        kullback_leibler_old
-          t1
-          t2
+      value
+
+    let shannon_entropy_float_list l =
+      let n =
+        L.fold_left
+          (fun acc (_, occurrence) -> acc +. occurrence)
+          0.
+          l
       in
+      let histo = A.of_list (L.map snd l) in
+      if n = 0. then
+        0.0
+      else
+        let rec loop sum ix =
+          if ix < 0 then sum
+          else
+            let freq = histo.(ix) in
+            if freq = 0. then loop sum (ix - 1)
+            else
+              (* let ffreq = freq in *)
+              loop (sum +. freq *. log freq) (ix - 1) in
+        let sum = loop 0.0 (Array.length histo - 1) in
+        (* let f_n = float n in *)
+        (* ((log2 f_n -. sum) /. f_n) /. log_2 *)
+        log2 n -. ((sum /. n) /. log_2)
+
+    let shannon_entropy_normalized_float_list l =
+      let length = L.length l in
+      assert(length > 0);
+      let value =
+        if length = 1 then
+          0.
+        else
+          (shannon_entropy_float_list l)
+          /.
+          (log2 (float_of_int (length)))
+      in
+
+      (* print_endline *)
+      (*   (sprintf *)
+      (*          "Distribution_metric: shannon_entropy_normalized: %f:\n%s" *)
+      (*          value *)
+      (*          (to_string *)
+      (*             To_string_mode.Normal *)
+      (*             t *)
+      (*          ) *)
+      (*   ); *)
 
       (* assert(value >= 0.); *)
       (* assert(value <= 1.); *)
 
-      if value < 0. then
-        (
-          print_endline
-            (sprintf
-               "jensen shannon (%f + %f = %f) (value_old: %f) < 0:\n%s\n%s"
-               kl1
-               kl2
-               value
-               value_old
-               (to_string_full t2)
-               (to_string_full t1)
-            );
-          assert(false)
-        );
-
-      (* if value > 1. then *)
-      (*   ( *)
-      (*         print_endline *)
-      (*           (sprintf *)
-      (*              "jensen shannon (%f + %f = %f) (value_old: %f) > 1:\n%s\n%s" *)
-      (*              kl1 *)
-      (*              kl2 *)
-      (*              value *)
-      (*              value_old *)
-      (*              (to_string To_string_mode.Normal t2) *)
-      (*              (to_string To_string_mode.Normal t1) *)
-      (*           ); *)
-      (*         assert(false) *)
-      (* ); *)
-
       value
-    )
 
-  let jensen_shannon_n weight_t_tuple_list =
-    (
-      (* PROBLEM: if number of distributions close to occurrence in each
-         distribution weighted occurrence = 0, and thus, sum = 0 *)
+    let kullback_leibler_old t1 t2 =
+      (
+        (* print_endline "Distribution_metric: kullback_leibler:
+           call"; *)
 
-      (* print_endline *)
-      (*   (sprintf *)
-      (*      "Distribution: jensen_shannon_n: call" *)
-      (*   ); *)
+        let keys_1 = keys t1 in
+        let keys_2 = keys t2 in
 
-      (* print_endline *)
-      (*   (sprintf *)
-      (*      "of_ip_group: weight_t_tuple_list:\n%s" *)
-      (*      (List_ext.to_string *)
-      (*         ~sep: "\n" *)
-      (*         (fun (weight, distribution) -> *)
-      (*            sprintf *)
-      (*              "%f-%s" *)
-      (*              weight *)
-      (*              (to_string *)
-      (*                 To_string_mode.Normal *)
-      (*                 distribution *)
-      (*              ) *)
-      (*         ) *)
-      (*         weight_t_tuple_list *)
-      (*      ) *)
-      (*   ); *)
+        let total_nb_occurence_1 = get_total_nb_occurrence t1 in
+        let total_nb_occurence_2 = get_total_nb_occurrence t2 in
 
-      (* let length = L.length weight_t_tuple_list in *)
+        assert(total_nb_occurence_1 > 0);
+        assert(total_nb_occurence_2 > 0);
 
-      (* let weight = 1. /. (float_of_int length) in *)
+        let keys = L.append keys_1 keys_2 in
+        let keys = L.unique 
+            ~eq: (fun k1 k2 -> Key.compare k1 k2 = 0)
+            keys 
+        in
+        (* let key_set = *)
+        (*         L.fold_right *)
+        (*           (fun key acc -> *)
+        (*             KeySet.add *)
+        (*               key *)
+        (*               acc *)
+        (*           ) *)
+        (*           keys *)
+        (*           KeySet.empty *)
+        (* in *)
 
-      let weight_float_t_tuple_list =
-        L.map
-          (fun (weight, t) ->
-             weight
-             ,
-             to_float_t
-               t
-          )
-          weight_t_tuple_list
-      in
-
-      let apply_weight (weight, float_t) =
-        (
-          let l =
-            Container_float.bindings
-              float_t
-          in
-
-          let new_l =
-            L.map
-              (fun (key, occurrence) ->
-                 let new_occurrence =
-                   weight *. occurrence
-                 in
-
-                 (key, new_occurrence)
-              )
-              l
-          in
-
-          let new_l_filtered =
-            L.filter
-              (fun (key, occurrence) -> occurrence > 0.)
-              new_l
-          in
-
-          let float_t_weighted : float Container.t = Container.create 0 in
-
-          L.iter
-            (fun (key, occurrences) ->
-               Container_float.add_occurrence
-                 float_t_weighted
+        let occurrence_1 =
+          L.map
+            (fun key ->
+               get_key_occurrence
                  key
-                 occurrences
-               ;
-
+                 t1
             )
-            new_l_filtered
-          ;
+            keys
+        in
+        let occurrence_2 =
+          L.map
+            (fun key ->
+               get_key_occurrence
+                 key
+                 t2
+            )
+            keys
+        in
 
-          float_t_weighted
-        )
-      in
+        let ratio_1 =
+          L.map
+            (fun occurrence ->
+               let ratio =
+                 (float_of_int occurrence) 
+                 /.
+                 (float_of_int total_nb_occurence_1)
+               in
 
-      let weight_float_t_tuple_list_weighted =
-        L.map
-          (fun (weight, float_t) ->
-             (weight, (apply_weight (weight, float_t)))
+               assert((Batteries.Float.compare ratio nan) <> 0);
+
+               ratio
+            )
+            occurrence_1
+        in
+        let ratio_2 =
+          L.map
+            (fun occurrence ->
+               let ratio =
+                 (float_of_int occurrence) 
+                 /.
+                 (float_of_int total_nb_occurence_2)
+               in
+
+               assert((Batteries.Float.compare ratio nan) <> 0);
+
+               ratio
+            )
+            occurrence_2
+        in
+
+        let kl_elements =
+          L.map2
+            (fun ratio_1 ratio_2 ->
+               let kl_1 =
+                 if ratio_2 = 0. then
+                   0.
+                 else
+                 if ratio_1 = 0. then
+                   0.
+                 else
+                   ratio_1 *. (log10 (ratio_1 /. ratio_2))
+               in
+
+               let kl_2 =
+                 if ratio_1 = 0. then
+                   0.
+                 else
+                 if ratio_2 = 0. then
+                   0.
+                 else
+                   ratio_2 *. (log10 (ratio_2 /. ratio_1))
+               in
+
+               kl_1 +. kl_2
+            )
+            ratio_1
+            ratio_2
+        in
+
+        let kl =
+          L.fold_right
+            (fun ratio acc -> ratio +. acc)
+            kl_elements
+            0.
+        in
+
+        assert((Batteries.Float.compare kl nan) <> 0);
+
+        (* print_endline "Distribution_metric: kullback_leibler: end"; *)
+
+        kl
+      )
+
+    let kullback_leibler_divergence t1 t2 =
+      (
+        (* print_endline "Distribution_metric: kullback_leibler: call"; *)
+
+        let keys_1 = keys t1 in
+        let keys_2 = keys t2 in
+
+        let total_nb_occurence_1 = get_total_nb_occurrence t1 in
+        let total_nb_occurence_2 = get_total_nb_occurrence t2 in
+
+        assert(total_nb_occurence_1 > 0);
+        assert(total_nb_occurence_2 > 0);
+
+        let keys = L.append keys_1 keys_2 in
+        let keys =
+          L.unique
+            ~eq: (fun k1 k2 -> Key.compare k1 k2 = 0)
+            keys
+        in
+
+        let occurrence_1 =
+          L.map
+            (fun key ->
+               get_key_occurrence
+                 key
+                 t1
+            )
+            keys
+        in
+        let occurrence_2 =
+          L.map
+            (fun key ->
+               get_key_occurrence
+                 key
+                 t2
+            )
+            keys
+        in
+
+        let ratio_1 =
+          L.map
+            (fun occurrence ->
+               let ratio =
+                 (float_of_int occurrence)
+                 /.
+                 (float_of_int total_nb_occurence_1)
+               in
+
+               assert((Batteries.Float.compare ratio nan) <> 0);
+
+               (* print_endline *)
+               (*   (sprintf *)
+               (*          "ratio 1 %f" *)
+               (*          ratio *)
+               (*   ); *)
+
+               ratio
+            )
+            occurrence_1
+        in
+        let ratio_2 =
+          L.map
+            (fun occurrence ->
+               let ratio =
+                 (float_of_int occurrence)
+                 /.
+                 (float_of_int total_nb_occurence_2)
+               in
+
+               assert((Batteries.Float.compare ratio nan) <> 0);
+
+               (* print_endline *)
+               (*   (sprintf *)
+               (*          "ratio 2 %f" *)
+               (*          ratio *)
+               (*   ); *)
+
+               ratio
+            )
+            occurrence_2
+        in
+
+        let kl_elements =
+          L.map2
+            (fun ratio_1 ratio_2 ->
+               let value =
+                 if ratio_2 = 0. then
+                   0.
+                 else
+                 if ratio_1 = 0. then
+                   0.
+                 else
+                   ratio_1 *. (log2 (ratio_1 /. ratio_2))
+               in
+               (* print_endline *)
+               (*   (sprintf *)
+               (*          "value %f" *)
+               (*          value *)
+               (*   ); *)
+               value
+            )
+            ratio_1
+            ratio_2
+        in
+
+        let kl =
+          L.fold_right
+            (fun ratio acc -> ratio +. acc)
+            kl_elements
+            0.
+        in
+
+        assert((Batteries.Float.compare kl nan) <> 0);
+
+        (* print_endline "Distribution_metric: kullback_leibler: end"; *)
+
+        kl
+      )
+
+    let kullback_leibler_distance t1 t2 =
+      (
+        let kl1 = kullback_leibler_divergence t1 t2 in
+        let kl2 = kullback_leibler_divergence t2 t1 in
+
+        (* if kl1 < 0. then *)
+        (*   ( *)
+        (*         print_endline *)
+        (*           (sprintf *)
+        (*              "negative kl for:\n%s\n%s" *)
+        (*              (to_string To_string_mode.Normal t1) *)
+        (*              (to_string To_string_mode.Normal t2) *)
+        (*           ); *)
+        (*         assert(false) *)
+        (*   ); *)
+        (* if kl2 < 0. then *)
+        (*   ( *)
+        (*         print_endline *)
+        (*           (sprintf *)
+        (*              "negative kl for:\n%s\n%s" *)
+        (*              (to_string To_string_mode.Normal t2) *)
+        (*              (to_string To_string_mode.Normal t1) *)
+        (*           ); *)
+        (*         assert(false) *)
+        (*   ); *)
+        (* assert(kl1 >= 0.); *)
+        (* assert(kl2 >= 0.); *)
+
+        let value =
+          (kl1 +. kl2) /. 2.
+        in
+
+        let value_old =
+          kullback_leibler_old
+            t1
+            t2
+        in
+
+        (* assert(value >= 0.); *)
+        (* assert(value <= 1.); *)
+
+        if value < 0. then
+          (
+            print_endline
+              (sprintf
+                 "jensen shannon (%f + %f = %f) (value_old: %f) < 0:\n%s\n%s"
+                 kl1
+                 kl2
+                 value
+                 value_old
+                 (to_string_full t2)
+                 (to_string_full t1)
+              );
+            assert(false)
+          );
+
+        (* if value > 1. then *)
+        (*   ( *)
+        (*         print_endline *)
+        (*           (sprintf *)
+        (*              "jensen shannon (%f + %f = %f) (value_old: %f) > 1:\n%s\n%s" *)
+        (*              kl1 *)
+        (*              kl2 *)
+        (*              value *)
+        (*              value_old *)
+        (*              (to_string To_string_mode.Normal t2) *)
+        (*              (to_string To_string_mode.Normal t1) *)
+        (*           ); *)
+        (*         assert(false) *)
+        (* ); *)
+
+        value
+      )
+
+    let jensen_shannon_n weight_t_tuple_list =
+      (
+        (* PROBLEM: if number of distributions close to occurrence in each
+           distribution weighted occurrence = 0, and thus, sum = 0 *)
+
+        (* print_endline *)
+        (*   (sprintf *)
+        (*      "Distribution: jensen_shannon_n: call" *)
+        (*   ); *)
+
+        (* print_endline *)
+        (*   (sprintf *)
+        (*      "of_ip_group: weight_t_tuple_list:\n%s" *)
+        (*      (List_ext.to_string *)
+        (*         ~sep: "\n" *)
+        (*         (fun (weight, distribution) -> *)
+        (*            sprintf *)
+        (*              "%f-%s" *)
+        (*              weight *)
+        (*              (to_string *)
+        (*                 To_string_mode.Normal *)
+        (*                 distribution *)
+        (*              ) *)
+        (*         ) *)
+        (*         weight_t_tuple_list *)
+        (*      ) *)
+        (*   ); *)
+
+        (* let length = L.length weight_t_tuple_list in *)
+
+        (* let weight = 1. /. (float_of_int length) in *)
+
+        let weight_float_t_tuple_list =
+          L.map
+            (fun (weight, t) ->
+               let float_container =
+                 to_float_t
+                   t
+               in
+
+               let number_occurrence_total_float =
+                 float_of_int
+                   (get_total_nb_occurrence
+                      t
+                   )
+               in                   
+
+               let float_container_normalized =
+                 Container_float.map
+                   (fun occurrence_float ->
+                      occurrence_float
+                      /.
+                      number_occurrence_total_float
+                   )
+                   float_container
+               in
+
+               weight, float_container_normalized
+            )
+            weight_t_tuple_list
+        in
+
+        let apply_weight (weight, float_t) =
+          (
+            let l =
+              Container_float.bindings
+                float_t
+            in
+
+            let new_l =
+              L.map
+                (fun (key, occurrence) ->
+                   let new_occurrence =
+                     weight *. occurrence
+                   in
+
+                   (key, new_occurrence)
+                )
+                l
+            in
+
+            let new_l_filtered =
+              L.filter
+                (fun (key, occurrence) -> occurrence > 0.)
+                new_l
+            in
+
+            let float_t_weighted : float Container.t = Container.create 0 in
+
+            L.iter
+              (fun (key, occurrences) ->
+                 Container_float.add_occurrence
+                   float_t_weighted
+                   key
+                   occurrences
+                 ;
+
+              )
+              new_l_filtered
+            ;
+
+            float_t_weighted
           )
-          weight_float_t_tuple_list
-      in
+        in
 
-      let first =
-        Container_float.copy (snd (L.hd weight_float_t_tuple_list_weighted))
-      in
+        let weight_float_t_tuple_list_weighted =
+          L.map
+            (fun (weight, float_t) ->
+               (weight, (apply_weight (weight, float_t)))
+            )
+            weight_float_t_tuple_list
+        in
 
-      let float_t_sum_weighted =
-        L.fold_left
-          (fun t_acc (_, occurrence) ->
-             Container_float.append
+        let first =
+          Container_float.copy (snd (L.hd weight_float_t_tuple_list_weighted))
+        in
+
+        let float_t_sum_weighted =
+          L.fold_left
+            (fun t_acc (_, t_to_append) ->
+               Container_float.append
+                 t_acc
+                 t_to_append;
+
                t_acc
-               occurrence;
+            )
+            first
+            (L.tl weight_float_t_tuple_list_weighted)
+        in
 
-             t_acc
-          )
-          first
-          (L.tl weight_float_t_tuple_list_weighted)
-      in
+        (* print_endline *)
+        (*   (sprintf *)
+        (*      "of_ip_group: weight_t_tuple_list_weighted:\n%s" *)
+        (*      (List_ext.to_string *)
+        (*         ~sep: "\n" *)
+        (*         (fun (weight, distribution) -> *)
+        (*            sprintf *)
+        (*              "%f-%s" *)
+        (*              weight *)
+        (*              (to_string_float *)
+        (*                 To_string_mode.Normal *)
+        (*                 distribution *)
+        (*              ) *)
+        (*         ) *)
+        (*         weight_float_t_tuple_list_weighted *)
+        (*      ) *)
+        (*   ); *)
 
-      (* print_endline *)
-      (*   (sprintf *)
-      (*      "of_ip_group: weight_t_tuple_list_weighted:\n%s" *)
-      (*      (List_ext.to_string *)
-      (*         ~sep: "\n" *)
-      (*         (fun (weight, distribution) -> *)
-      (*            sprintf *)
-      (*              "%f-%s" *)
-      (*              weight *)
-      (*              (to_string_float *)
-      (*                 To_string_mode.Normal *)
-      (*                 distribution *)
-      (*              ) *)
-      (*         ) *)
-      (*         weight_float_t_tuple_list_weighted *)
-      (*      ) *)
-      (*   ); *)
+        (* print_endline *)
+        (*   (sprintf *)
+        (*      "[Distribution_metric]: jensen_shannon_n: t_sum_weighted:\n%s" *)
+        (*      (to_string_float *)
+        (*        To_string_mode.Normal *)
+        (*        float_t_sum_weighted *)
+        (*      ) *)
+        (*   ); *)
 
-      (* print_endline *)
-      (*   (sprintf *)
-      (*      "[Distribution_metric]: jensen_shannon_n: t_sum_weighted:\n%s" *)
-      (*      (to_string_float *)
-      (*        To_string_mode.Normal *)
-      (*        float_t_sum_weighted *)
-      (*      ) *)
-      (*   ); *)
+        let shannon_entropy_float_t_sum_weighted =
+          shannon_entropy_normalized_float_list
+            (Container_float.bindings float_t_sum_weighted)
+        in
 
-      let shannon_entropy_float_t_sum_weighted =
-        shannon_entropy_normalized_float_list
-          (Container_float.bindings float_t_sum_weighted)
-      in
+        (*       let occurrence_float_list_list = *)
+        (*       let p_list_list = *)
+        (*         L.map *)
+        (* (fun (w, t) -> *)
+        (*             let occurrence_list =  *)
+        (*               L.map *)
+        (*                 snd *)
+        (*                 (bindings t) *)
+        (*             in *)
 
-      (*       let occurrence_float_list_list = *)
-      (*       let p_list_list = *)
-      (*         L.map *)
-      (* (fun (w, t) -> *)
-      (*             let occurrence_list =  *)
-      (*               L.map *)
-      (*                 snd *)
-      (*                 (bindings t) *)
-      (*             in *)
+        (*             let n = L.length occurrence_list in *)
 
-      (*             let n = L.length occurrence_list in *)
+        (*             let occurrence_float_list = *)
+        (*               L.map *)
+        (*                 float *)
+        (*                 occurrence_list *)
+        (*             in *)
 
-      (*             let occurrence_float_list = *)
-      (*               L.map *)
-      (*                 float *)
-      (*                 occurrence_list *)
-      (*             in *)
+        (* occurrence_float_list *)
+        (*           ) *)
+        (*           weight_t_tuple_list *)
+        (*       in *)
 
-      (* occurrence_float_list *)
-      (*           ) *)
-      (*           weight_t_tuple_list *)
-      (*       in *)
+        (*             let p_list = *)
+        (*               L.map *)
+        (*                 (fun occurrence_float -> occurrence_float /. (float n)) *)
+        (*                 occurence_float_list *)
+        (*             in *)
 
-      (*             let p_list = *)
-      (*               L.map *)
-      (*                 (fun occurrence_float -> occurrence_float /. (float n)) *)
-      (*                 occurence_float_list *)
-      (*             in *)
-
-      (*             p_list *)
+        (*             p_list *)
 
 
-      (*       let shannon_entropy_t_sum_weighted__ = *)
-      (* shannon_entropy_of_p_list *)
+        (*       let shannon_entropy_t_sum_weighted__ = *)
+        (* shannon_entropy_of_p_list *)
 
-      (*       in *)
+        (*       in *)
 
-      (* print_endline *)
-      (*   (sprintf *)
-      (*      "Distribution: jensen_shannon_n: shannon_entropy_t_sum_weighted: %f:\nt_sum_weighted: %s" *)
-      (*      shannon_entropy_float_t_sum_weighted *)
-      (*      (to_string_float *)
-      (*         To_string_mode.Normal *)
-      (*         float_t_sum_weighted *)
-      (*      ) *)
-      (*   ); *)
+        (* print_endline *)
+        (*   (sprintf *)
+        (*      "Distribution: jensen_shannon_n: shannon_entropy_t_sum_weighted: %f:\nt_sum_weighted: %s" *)
+        (*      shannon_entropy_float_t_sum_weighted *)
+        (*      (to_string_float *)
+        (*         To_string_mode.Normal *)
+        (*         float_t_sum_weighted *)
+        (*      ) *)
+        (*   ); *)
 
-      let shannon_entropy_weighted_list =
-        L.map
-          (fun (weight, t) ->
-             assert(weight > 0.);
+        let shannon_entropy_weighted_list =
+          L.map
+            (fun (weight, t) ->
+               assert(weight > 0.);
 
-             let shannon_entropy = shannon_entropy_normalized t in
+               let shannon_entropy = shannon_entropy_normalized t in
 
-             let shannon_entropy_weighted =
-               weight
-               *.
-               shannon_entropy
-             in
+               let shannon_entropy_weighted =
+                 weight
+                 *.
+                 shannon_entropy
+               in
 
-             (* print_endline *)
-             (*   (sprintf *)
-             (*          "Distribution: jensen_shannon_n: shannon_entropy: %f * %f = %f:\nt: %s" *)
-             (*          weight *)
-             (*          shannon_entropy *)
-             (*          shannon_entropy_weighted *)
-             (*          (to_string *)
-             (*             To_string_mode.Normal *)
-             (*             t *)
-             (*          ) *)
-             (*   ); *)
+               (* print_endline *)
+               (*   (sprintf *)
+               (*          "Distribution: jensen_shannon_n: shannon_entropy: %f * %f = %f:\nt: %s" *)
+               (*          weight *)
+               (*          shannon_entropy *)
+               (*          shannon_entropy_weighted *)
+               (*          (to_string *)
+               (*             To_string_mode.Normal *)
+               (*             t *)
+               (*          ) *)
+               (*   ); *)
 
-             shannon_entropy_weighted
-          )
+               shannon_entropy_weighted
+            )
+            weight_t_tuple_list
+        in
+
+        let shannon_entropy_weighted_sum =
+          L.fold_left
+            (fun shannon_entropy_weighted shannon_entropy_weighted_acc ->
+               shannon_entropy_weighted_acc +. shannon_entropy_weighted
+            )
+            (L.hd shannon_entropy_weighted_list)
+            (L.tl shannon_entropy_weighted_list)
+        in
+
+        (* print_endline *)
+        (*   (sprintf *)
+        (*      "Distribution: jensen_shannon_n: shannon_entropy_weighted_sum: %f" *)
+        (*      shannon_entropy_weighted_sum *)
+        (*   ); *)
+
+        let value =
+          shannon_entropy_float_t_sum_weighted
+          -.
+          shannon_entropy_weighted_sum      
+        in
+
+        (* print_endline *)
+        (*   (sprintf *)
+        (*      "Distribution: jensen_shannon_n: jensen-shannon divergence: %f" *)
+        (*      value *)
+        (*   ); *)
+
+        (* print_endline *)
+        (*   (sprintf *)
+        (*      "Distribution: jensen_shannon_n: end" *)
+        (*   ); *)
+
+        value
+      )
+
+    (* TODO: rename to jensen_shannon_divergence *)
+    let jensen_shannon_n_length_weight t_list =
+      (
+        let weight = 1. /. (float_of_int (L.length t_list)) in
+
+        let weight_t_tuple_list =
+          L.map
+            (fun t ->
+               (weight, t)
+            )
+            t_list
+        in
+
+        jensen_shannon_n
           weight_t_tuple_list
-      in
-
-      let shannon_entropy_weighted_sum =
-        L.fold_left
-          (fun shannon_entropy_weighted shannon_entropy_weighted_acc ->
-             shannon_entropy_weighted_acc +. shannon_entropy_weighted
-          )
-          (L.hd shannon_entropy_weighted_list)
-          (L.tl shannon_entropy_weighted_list)
-      in
-
-      (* print_endline *)
-      (*   (sprintf *)
-      (*      "Distribution: jensen_shannon_n: shannon_entropy_weighted_sum: %f" *)
-      (*      shannon_entropy_weighted_sum *)
-      (*   ); *)
-
-      let value =
-        shannon_entropy_float_t_sum_weighted
-        -.
-        shannon_entropy_weighted_sum      
-      in
-
-      (* print_endline *)
-      (*   (sprintf *)
-      (*      "Distribution: jensen_shannon_n: jensen-shannon divergence: %f" *)
-      (*      value *)
-      (*   ); *)
-
-      (* print_endline *)
-      (*   (sprintf *)
-      (*      "Distribution: jensen_shannon_n: end" *)
-      (*   ); *)
-
-      value
-    )
-
-  let jensen_shannon_n_length_weight t_list =
-    (
-      let weight = 1. /. (float_of_int (L.length t_list)) in
-
-      let weight_t_tuple_list =
-        L.map
-          (fun t ->
-             (weight, t)
-          )
-          t_list
-      in
-
-      jensen_shannon_n
-        weight_t_tuple_list
-    )
+      )
 
   end
 
