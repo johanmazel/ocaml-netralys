@@ -31,7 +31,7 @@ let of_ipaddr_list ipaddr_list =
     L.map
       (fun ipaddr ->
          Uint32.of_int32
-     (Ipaddr.V4.to_int32
+           (Ipaddr.V4.to_int32
               (* (Ipaddr.to_v4 (fst tuple)) *)
               (match ipaddr with
                | Ipaddr.V4 ipaddr -> ipaddr
@@ -188,6 +188,12 @@ let fold_right_ipaddr f t init =
   | V4 container -> Ip_address_data_structures_V4.Container.fold_right_ipaddr f container init
   | V6 container -> Ip_address_data_structures_V6.Container.fold_right_ipaddr f container init
     
+let number_prefix t =
+  match t with
+  | Empty -> 0
+  | V4 container -> Ip_address_data_structures_V4.Container.number_prefix container
+  | V6 container -> Ip_address_data_structures_V6.Container.number_prefix container
+
 let number_24_prefix t =
   match t with
   | Empty -> 0
