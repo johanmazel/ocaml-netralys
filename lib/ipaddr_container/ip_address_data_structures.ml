@@ -934,6 +934,7 @@ struct
 
       Prefix_set.cardinal prefix_set
 
+    (* Deprecated *)
     let number_24_prefix t =
       let prefix_set_init = Prefix_set.empty in
 

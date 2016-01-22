@@ -188,12 +188,13 @@ let fold_right_ipaddr f t init =
   | V4 container -> Ip_address_data_structures_V4.Container.fold_right_ipaddr f container init
   | V6 container -> Ip_address_data_structures_V6.Container.fold_right_ipaddr f container init
     
-let number_prefix t =
+let number_prefix size t =
   match t with
   | Empty -> 0
-  | V4 container -> Ip_address_data_structures_V4.Container.number_prefix container
-  | V6 container -> Ip_address_data_structures_V6.Container.number_prefix container
+  | V4 container -> Ip_address_data_structures_V4.Container.number_prefix size container
+  | V6 container -> Ip_address_data_structures_V6.Container.number_prefix size container
 
+(* Deprecated *)
 let number_24_prefix t =
   match t with
   | Empty -> 0
