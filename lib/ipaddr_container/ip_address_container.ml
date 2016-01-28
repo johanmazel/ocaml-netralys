@@ -188,6 +188,22 @@ let fold_right_ipaddr f t init =
   | V4 container -> Ip_address_data_structures_V4.Container.fold_right_ipaddr f container init
   | V6 container -> Ip_address_data_structures_V6.Container.fold_right_ipaddr f container init
     
+let prefix_list size t =
+  match t with
+  | Empty -> raise (Invalid_argument "[Ip_address_container]: prefix_list: Empty")
+  | V4 container ->
+    L.map
+      (fun prefix -> Ipaddr.V4 prefix)
+      (Ip_address_data_structures_V4.Container.prefix_list
+         size
+         container)
+  | V6 container ->
+    L.map
+      (fun prefix -> Ipaddr.V6 prefix)
+      (Ip_address_data_structures_V6.Container.prefix_list
+         size
+         container)
+
 let number_prefix size t =
   match t with
   | Empty -> 0

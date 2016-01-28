@@ -278,26 +278,6 @@ let of_melange_ethernet
                   let src_ipaddr = Ipaddr.V6.of_string_exn (Unix.string_of_inet_addr (Obj.magic ip6_pdu.Ip6.Pdu.src)) in
                   let dst_ipaddr = Ipaddr.V6.of_string_exn (Unix.string_of_inet_addr (Obj.magic ip6_pdu.Ip6.Pdu.dst)) in
 
-                  (* TODO: remove this when thoroughly checked *)
-                  let ipaddr = (Ipaddr.V6 src_ipaddr) in
-                  (* let admd_ipaddr = Admd.Ipaddr_sb.test.of_ipaddr ipaddr in *)
-                  (* let new_ipaddr = Admd.Ipaddr_sb.test.to_ipaddr admd_ipaddr in *)
-                  let admd_ipaddr = Admd.Ipaddr_sb.of_ipaddr ipaddr in
-                  let new_ipaddr = Admd.Ipaddr_sb.to_ipaddr admd_ipaddr in
-
-                  if Ipaddr.compare ipaddr new_ipaddr <> 0 then
-                    (
-                      print_endline
-                        (sprintf
-                           "conversion problem: %s /= %s (%s)"
-                           (Ipaddr.to_string ipaddr)
-                           (Ipaddr.to_string new_ipaddr)
-                           (* (Admd.Ipaddr_sb.test.to_string admd_ipaddr) *)
-                           (Admd.Ipaddr_sb.to_string admd_ipaddr)
-                        );
-                      assert(false)
-                    );
-
                   let ipv6_data_for_metrics_pdu_t : Ipv6_data_for_metrics.pdu_t =
                     pdu_t_of_ipv6
                       pcap_header.Pcap_header.caplen

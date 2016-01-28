@@ -46,7 +46,7 @@ let of_ipaddr_list ipaddr_list =
       let l =
         L.map
           (fun ipaddr ->
-       Ipaddr.V4.to_int32
+             Ipaddr.V4.to_int32
                (* (Ipaddr.to_v4 (fst tuple)) *)
                (match ipaddr with
                 | Ipaddr.V4 ipaddr -> ipaddr
@@ -61,7 +61,7 @@ let of_ipaddr_list ipaddr_list =
       let int32_tuple_l =
         L.map
           (fun ipaddr ->
-       Ipaddr.V6.to_int32
+             Ipaddr.V6.to_int32
                (match ipaddr with
                 | Ipaddr.V4 ipaddr -> raise (Invalid_argument "Anomaly_ip_address: of_detailed_metrics: IPv4 when expected IPv6")
                 | Ipaddr.V6 ipaddr -> ipaddr

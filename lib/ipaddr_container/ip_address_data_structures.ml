@@ -914,7 +914,7 @@ struct
 
       result
 
-    let number_prefix size t =
+    let prefix_list size t =
       let prefix_set_init = Prefix_set.empty in
 
       let prefix_set =
@@ -932,7 +932,31 @@ struct
           prefix_set_init
       in
 
-      Prefix_set.cardinal prefix_set
+      Prefix_set.to_list prefix_set
+
+    let number_prefix size t =
+      L.length
+        (prefix_list size t)
+        
+    (* let number_prefix size t = *)
+    (*   let prefix_set_init = Prefix_set.empty in *)
+
+    (*   let prefix_set = *)
+    (*     Unsigned_int_set.fold *)
+    (*       (fun ipaddr prefix_set_acc -> *)
+    (*          let ip_address = *)
+    (*            Ip_address.of_unsigned_int ipaddr *)
+    (*          in *)
+    (*          let prefix = Prefix.make size ip_address in *)
+    (*          Prefix_set.add *)
+    (*            prefix *)
+    (*            prefix_set_acc *)
+    (*       ) *)
+    (*       t.data *)
+    (*       prefix_set_init *)
+    (*   in *)
+
+    (*   Prefix_set.cardinal prefix_set *)
 
     (* Deprecated *)
     let number_24_prefix t =
