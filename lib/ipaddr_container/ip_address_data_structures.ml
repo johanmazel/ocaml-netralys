@@ -979,6 +979,8 @@ struct
 
       Prefix_set.cardinal prefix_set
 
+    (* TODO: add max_prefix_length -> 32/128*)
+    
     let array1_to_array
         array1
       =
@@ -1461,6 +1463,9 @@ struct
       new_t
         set_without_first_last
 
+    let prefix_max_size =
+      Prefix.max_size
+    
   end
 
   module Container_special = struct

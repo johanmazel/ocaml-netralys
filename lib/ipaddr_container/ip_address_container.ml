@@ -276,3 +276,9 @@ let extract_smallest_biggest_part_around_biggest_gap t =
   | V6 container ->
     let tuple = Ip_address_data_structures_V6.Container.extract_smallest_biggest_part_around_biggest_gap container in
     V6 (fst tuple), V6 (snd tuple)
+
+let prefix_max_size t =
+  match t with
+  | Empty -> 0
+  | V4 container -> Ip_address_data_structures_V4.Container.prefix_max_size
+  | V6 container -> Ip_address_data_structures_V6.Container.prefix_max_size
