@@ -1003,8 +1003,14 @@ struct
              in
 
              debug
-               "nth_bit_zero: ip_address: %s ; network_small: %s ; network_current: %s ; diff: %d"
+               "nth_bit_zero: ip_address: %s ; bit_indice: %d ; prefix_small: %s ; prefix_current: %s"
                (Ip_address.to_string ip_address)
+               bit_indice
+               (Prefix.to_string prefix_small)
+               (Prefix.to_string prefix_current)
+             ;
+             debug
+               "nth_bit_zero: network_small: %s ; network_current: %s ; diff: %d"
                (Ip_address.to_string network_small)
                (Ip_address.to_string network_current)
                (Unsigned_int.to_int diff)
