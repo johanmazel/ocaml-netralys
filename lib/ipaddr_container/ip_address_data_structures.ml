@@ -1003,7 +1003,8 @@ struct
              in
 
              debug
-               "nth_bit_zero: network_small: %s ; network_current: %s ; diff: %d"
+               "nth_bit_zero: ip_address: %s ; network_small: %s ; network_current: %s ; diff: %d"
+               (Ip_address.to_string ip_address)
                (Ip_address.to_string network_small)
                (Ip_address.to_string network_current)
                (Unsigned_int.to_int diff)
