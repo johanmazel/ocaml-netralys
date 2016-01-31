@@ -11,7 +11,7 @@ open Bin_prot.Std
        
 open Hashtbl_utils_instantiations
     
-let debug_enabled = ref false
+let debug_enabled = ref true
 
 let set_debug bool = debug_enabled := bool
 
@@ -982,6 +982,8 @@ struct
       Prefix_set.cardinal prefix_set
 
     let nth_bit_zero bit_indice t =
+      debug "nth_bit_zero: call";
+      
       assert(bit_indice > 0);
       let unsigned_int_set_zero =
         Unsigned_int_set.fold
@@ -999,6 +1001,13 @@ struct
                  (Ip_address.to_unsigned_int network_current)
                  (Ip_address.to_unsigned_int network_small)
              in
+
+             debug
+               "nth_bit_zero: network_small: %s ; network_current: %s ; diff: %d"
+               (Ip_address.to_string network_small)
+               (Ip_address.to_string network_current)
+               (Unsigned_int.to_int diff)
+             ;
 
              let is_zero =
                Unsigned_int.compare
@@ -1028,6 +1037,8 @@ struct
           unsigned_int_set_zero
       in
 
+      debug "nth_bit_zero: end";
+      
       r
     
     let array1_to_array
