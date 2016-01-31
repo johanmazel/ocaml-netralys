@@ -676,6 +676,8 @@ struct
 
   module Container = struct
 
+    module P = Prefix
+      
     type t =
       {
         data : Unsigned_int_set.t;
@@ -964,9 +966,9 @@ struct
 
       let prefix_set =
         Unsigned_int_set.fold
-          (fun ipaddr prefix_set_acc ->
+          (fun uint prefix_set_acc ->
              let ip_address =
-               Ip_address.of_unsigned_int ipaddr
+               Ip_address.of_unsigned_int uint
              in
              let prefix = Prefix.make 24 ip_address in
              Prefix_set.add
@@ -979,7 +981,54 @@ struct
 
       Prefix_set.cardinal prefix_set
 
-    (* TODO: add max_prefix_length -> 32/128*)
+    let nth_bit_zero bit_indice t =
+      assert(bit_indice > 0);
+      let unsigned_int_set_zero =
+        Unsigned_int_set.fold
+          (fun uint acc ->
+             let ip_address = Ip_address.of_unsigned_int uint in
+
+             let prefix_small = Prefix.make (bit_indice - 1) ip_address in
+             let prefix_current = Prefix.make bit_indice ip_address in
+
+             let network_small = Prefix.network prefix_small in
+             let network_current = Prefix.network prefix_current in
+
+             let diff =
+               Unsigned_int.sub
+                 (Ip_address.to_unsigned_int network_current)
+                 (Ip_address.to_unsigned_int network_small)
+             in
+
+             let is_zero =
+               Unsigned_int.compare
+                 diff
+                 (Unsigned_int.of_bin_int
+                    (Bin_int.of_int32
+                       Int32.zero
+                    )
+                 )
+               =
+               0
+             in
+
+             if is_zero then
+               Unsigned_int_set.add
+                 uint
+                 acc
+             else
+               acc
+          )
+          t.data
+          Unsigned_int_set.empty
+      in
+
+      let r :t =
+        new_t
+          unsigned_int_set_zero
+      in
+
+      r
     
     let array1_to_array
         array1

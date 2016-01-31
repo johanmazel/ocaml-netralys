@@ -282,3 +282,13 @@ let prefix_max_size t =
   | Empty -> 0
   | V4 container -> Ip_address_data_structures_V4.Container.prefix_max_size
   | V6 container -> Ip_address_data_structures_V6.Container.prefix_max_size
+
+let nth_bit_zero bit_indice t =
+  match t with
+  | Empty -> raise (Invalid_argument "[Ip_address_container]: nth_bit_zero: Empty")
+  | V4 container ->
+    V4
+      (Ip_address_data_structures_V4.Container.nth_bit_zero bit_indice container)
+  | V6 container ->
+    V6
+      (Ip_address_data_structures_V6.Container.nth_bit_zero bit_indice container)
