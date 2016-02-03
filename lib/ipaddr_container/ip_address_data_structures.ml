@@ -11,7 +11,7 @@ open Bin_prot.Std
        
 open Hashtbl_utils_instantiations
     
-let debug_enabled = ref true
+let debug_enabled = ref false
 
 let set_debug bool = debug_enabled := bool
 
