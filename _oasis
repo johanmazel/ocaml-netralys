@@ -52,10 +52,8 @@ Library netralys_packet_data
 
                  comparelib,
                  comparelib.syntax,
-                 sexplib,
-                 sexplib.syntax,
-                 bin_prot,
-                 bin_prot.syntax,
+                 pa_sexp_conv,
+                 pa_bin_prot,
 
                  robinet_parsing,
                  admd,
@@ -73,10 +71,8 @@ Library netralys_flow
 
                  comparelib,
                  comparelib.syntax,
-                 sexplib,
-                 sexplib.syntax,
-                 bin_prot,
-                 bin_prot.syntax,
+                 pa_sexp_conv,
+                 pa_bin_prot,
 
                  jl,
                  netralys_packet_data,
@@ -150,10 +146,8 @@ Library netralys_ipaddr_container
 
                  comparelib,
                  comparelib.syntax,
-                 sexplib,
-                 sexplib.syntax,
-                 bin_prot,
-                 bin_prot.syntax,
+                 pa_sexp_conv,
+                 pa_bin_prot,
 
                  jl,
                  netralys_packet_data
