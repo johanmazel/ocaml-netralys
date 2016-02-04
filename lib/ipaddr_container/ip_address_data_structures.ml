@@ -1567,16 +1567,16 @@ struct
 
     let compare_subset_element_set_h t1 t2 =
       BatHashtbl_utils.compare      
-        Core.Core_int.Set.compare
+        Core_kernel.Core_int.Set.compare
         (BatHashtbl.of_enum (L.enum (Int_core_ht.to_alist t1)))
         (BatHashtbl.of_enum (L.enum (Int_core_ht.to_alist t2)))
 
-    type element_subset_set_h = Core.Core_int.Set.t Int_core_ht.t
+    type element_subset_set_h = Core_kernel.Core_int.Set.t Int_core_ht.t
     with sexp, bin_io
 
     let compare_element_subset_set_h t1 t2 =
       BatHashtbl_utils.compare
-        Core.Core_int.Set.compare
+        Core_kernel.Core_int.Set.compare
         (BatHashtbl.of_enum (L.enum (Int_core_ht.to_alist t1)))
         (BatHashtbl.of_enum (L.enum (Int_core_ht.to_alist t2)))
 
@@ -1621,7 +1621,7 @@ struct
     let to_string_int_set set =
       List_ext.to_string
         string_of_int
-        (Core.Core_int.Set.to_list set)
+        (Core_kernel.Core_int.Set.to_list set)
 
     let to_string_bin_int_set set =
       Bin_int_set.to_string set
@@ -1677,7 +1677,7 @@ struct
             t.subset_element_set_h
             subset_indice
         in
-        Core.Core_int.Set.iter
+        Core_kernel.Core_int.Set.iter
           element_set_found
           (fun element ->
              let subset_set_found =
@@ -1687,13 +1687,13 @@ struct
              in
 
              let new_subset_set =
-               Core.Core_int.Set.remove
+               Core_kernel.Core_int.Set.remove
                  subset_set_found
                  subset_indice
              in
 
              (* if Int_set.cardinal new_subset_set = 0 then *)
-             if Core.Core_int.Set.is_empty new_subset_set then
+             if Core_kernel.Core_int.Set.is_empty new_subset_set then
                Int_core_ht.remove
                  t.element_subset_set_h
                  element        
@@ -1746,7 +1746,7 @@ struct
           element_set;
 
         (* add subset indice for each element indice in element_subset_set_h *)
-        Core.Core_int.Set.iter
+        Core_kernel.Core_int.Set.iter
           element_set
           (fun element ->
              try
@@ -1756,10 +1756,10 @@ struct
                    element
                in
 
-               assert(Core.Core_int.Set.mem subset_set_found subset_indice = false);
+               assert(Core_kernel.Core_int.Set.mem subset_set_found subset_indice = false);
 
                let new_subset_set =
-                 Core.Core_int.Set.add
+                 Core_kernel.Core_int.Set.add
                    subset_set_found
                    subset_indice
                in
@@ -1772,7 +1772,7 @@ struct
              | Not_found ->
                (
                  let new_subset_set =
-                   Core.Core_int.Set.singleton
+                   Core_kernel.Core_int.Set.singleton
                      subset_indice
                  in
 
@@ -1841,7 +1841,7 @@ struct
 
                        (* add new element indice to previous element set *)
                        let new_element_set =
-                         Core.Core_int.Set.add
+                         Core_kernel.Core_int.Set.add
                            previous_element_set
                            element_indice
                        in
@@ -1894,7 +1894,7 @@ struct
 
                        (* add new element indice to previous element set *)
                        let new_element_set =
-                         Core.Core_int.Set.add
+                         Core_kernel.Core_int.Set.add
                            previous_element_set
                            element_indice
                        in
@@ -1930,7 +1930,7 @@ struct
           (
             add_subset
               t
-              (Core.Core_int.Set.singleton element_indice)
+              (Core_kernel.Core_int.Set.singleton element_indice)
               bin_int_set_remaining_after_adding;
           );
 
@@ -1948,7 +1948,7 @@ struct
             element_indice
         in
 
-        Core.Core_int.Set.iter
+        Core_kernel.Core_int.Set.iter
           subset_indice_set
           (fun subset_indice ->
              let element_indice_set_found =
@@ -1957,9 +1957,9 @@ struct
                  subset_indice
              in
 
-             assert(Core.Core_int.Set.length element_indice_set_found > 0);
+             assert(Core_kernel.Core_int.Set.length element_indice_set_found > 0);
 
-             if Core.Core_int.Set.length element_indice_set_found = 1 then
+             if Core_kernel.Core_int.Set.length element_indice_set_found = 1 then
                (
                  (* current subset is only reference by element to remove *)
                  Int_core_ht.remove
@@ -1973,7 +1973,7 @@ struct
              else
                (
                  let new_element_indice_set =
-                   Core.Core_int.Set.remove
+                   Core_kernel.Core_int.Set.remove
                      element_indice_set_found
                      element_indice
                  in
@@ -2030,7 +2030,7 @@ struct
           element_indice
       in
 
-      let subset_indice_list = Core.Core_int.Set.elements subset_set in
+      let subset_indice_list = Core_kernel.Core_int.Set.elements subset_set in
 
       let subset_list =
         L.map
@@ -2077,15 +2077,15 @@ struct
       in
 
       let subset_indice_set_inter =
-        Core.Core_int.Set.inter
+        Core_kernel.Core_int.Set.inter
           subset_indice_set_1
           subset_indice_set_2
       in
 
-      match Core.Core_int.Set.is_empty subset_indice_set_inter with
+      match Core_kernel.Core_int.Set.is_empty subset_indice_set_inter with
       | true -> Bin_int_set.empty
       | false ->
-        Core.Core_int.Set.fold
+        Core_kernel.Core_int.Set.fold
           ~f: (fun subset_acc subset_indice ->
               let subset =
                 Int_core_ht.find_exn
@@ -2113,15 +2113,15 @@ struct
       in
 
       let subset_indice_set_union =
-        Core.Core_int.Set.union
+        Core_kernel.Core_int.Set.union
           subset_indice_set_1
           subset_indice_set_2
       in
 
-      match Core.Core_int.Set.is_empty subset_indice_set_union with
+      match Core_kernel.Core_int.Set.is_empty subset_indice_set_union with
       | true -> 0
       | false ->
-        Core.Core_int.Set.fold
+        Core_kernel.Core_int.Set.fold
           ~f: (fun length_acc subset_indice ->
               let subset =
                 Int_core_ht.find_exn
@@ -2141,7 +2141,7 @@ struct
       let subset_indice_set_inter =
         L.fold_right
           (fun subset_indice_set subset_indice_set_inter ->
-             Core.Core_int.Set.inter
+             Core_kernel.Core_int.Set.inter
                subset_indice_set
                subset_indice_set_inter
           )
@@ -2149,10 +2149,10 @@ struct
           (L.hd subset_indice_set_tuple_list)
       in
 
-      match Core.Core_int.Set.length subset_indice_set_inter with
+      match Core_kernel.Core_int.Set.length subset_indice_set_inter with
       | 0 -> 0
       | 1 -> 
-        let subset_indice = Core.Core_int.Set.min_elt_exn subset_indice_set_inter in
+        let subset_indice = Core_kernel.Core_int.Set.min_elt_exn subset_indice_set_inter in
         let subset =
           Int_core_ht.find_exn
             t.subset_h
@@ -2190,7 +2190,7 @@ struct
           element_indice
       in
 
-      Core.Core_int.Set.fold
+      Core_kernel.Core_int.Set.fold
         ~f: (fun length_acc subset_indice ->
             let element_indice_set_found =
               Int_core_ht.find_exn
@@ -2198,7 +2198,7 @@ struct
                 subset_indice
             in
 
-            match Core.Core_int.Set.length element_indice_set_found with
+            match Core_kernel.Core_int.Set.length element_indice_set_found with
             | 0 -> failwith "Empty element_indice_set found !!!!"
             | 1 -> 
               (* this subset belong to this element indice only *)
@@ -2219,7 +2219,7 @@ struct
     let fold f t acc =
       Int_core_ht.fold
         ~f: (fun ~key: (element_indice : int) ~data: subset_indice_set h_acc ->
-           Core.Core_int.Set.fold
+           Core_kernel.Core_int.Set.fold
              ~f: (fun s_acc (subset_indice : int) ->
                  let subset =
                    Int_core_ht.find_exn
@@ -2241,7 +2241,7 @@ struct
     let fold_container f t acc =
       Int_core_ht.fold
         ~f: (fun ~key: (element_indice : int) ~data: subset_indice_set h_acc ->
-           Core.Core_int.Set.fold
+           Core_kernel.Core_int.Set.fold
              ~f: (fun s_acc (subset_indice : int) ->
                  let subset =
                    Int_core_ht.find_exn
