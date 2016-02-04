@@ -1562,7 +1562,7 @@ struct
         (BatHashtbl.of_enum (L.enum (Int_core_ht.to_alist t1)))
         (BatHashtbl.of_enum (L.enum (Int_core_ht.to_alist t2)))
 
-    type subset_element_set_h = Core.Core_int.Set.t Int_core_ht.t
+    type subset_element_set_h = Core_kernel.Core_int.Set.t Int_core_ht.t
     with sexp, bin_io
 
     let compare_subset_element_set_h t1 t2 =
