@@ -33,7 +33,7 @@ module Make = functor (Key : KEY) -> struct
   module Key_set = Batteries.Set.Make(Key);;
 
   module Key_core_map = struct
-    include Core.Core_map.Make(
+    include Core_kernel.Core_map.Make(
       struct
         type t = Key.t
         with sexp, bin_io
