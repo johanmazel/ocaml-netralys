@@ -1223,7 +1223,7 @@ let of_trace_statistics_detailed_metrics
         (fun port _ ->
            port <= 1023
         )
-        src_port
+        dst_port
     in
     let prop_dst_port_system =
       int_ratio
