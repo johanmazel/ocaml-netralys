@@ -82,6 +82,20 @@ let filter_prefix prefix t =
     in
     V6 (Ip_address_data_structures_V6.Container.filter_prefix prefix_v6 container)
 
+let prefix t =
+  match t with
+  | Empty -> raise (Invalid_argument "[Ip_address_container]: prefix: Empty")
+  | V4 container ->
+    Ipaddr.V4
+      (Ip_address_data_structures_V4.Container.prefix
+         container
+      )
+  | V6 container ->
+    Ipaddr.V6
+      (Ip_address_data_structures_V6.Container.prefix
+         container
+      )
+      
 let prefix_old t =
   match t with
   | Empty -> raise (Invalid_argument "[Ip_address_container]: prefix: Empty")
@@ -96,19 +110,20 @@ let prefix_old t =
          container
       )
       
-let prefix t =
+let prefix_old_2 t =
   match t with
   | Empty -> raise (Invalid_argument "[Ip_address_container]: prefix: Empty")
   | V4 container ->
     Ipaddr.V4
-      (Ip_address_data_structures_V4.Container.prefix
+      (Ip_address_data_structures_V4.Container.prefix_old_2
          container
       )
   | V6 container ->
     Ipaddr.V6
-      (Ip_address_data_structures_V6.Container.prefix
+      (Ip_address_data_structures_V6.Container.prefix_old_2
          container
       )
+      
 
 
 

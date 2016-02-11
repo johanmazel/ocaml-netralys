@@ -846,6 +846,48 @@ struct
             Ip_address.null
         else
           let first_ipaddr = Unsigned_int_set.min_elt t.data in
+          let last_ipaddr = Unsigned_int_set.max_elt t.data in
+
+          let first_ip_address =
+            Ip_address.of_unsigned_int
+              first_ipaddr          
+          in
+          let last_ip_address =
+            Ip_address.of_unsigned_int
+              last_ipaddr          
+          in
+
+          let prefix =
+            Prefix_utils.common_prefix_between_ipaddr
+              first_ip_address
+              last_ip_address
+          in
+
+          debug "Container: prefix: prefix: %s" (Prefix.to_string prefix);
+
+          prefix
+      in
+
+      debug "Container: prefix: end";
+
+      result
+
+    let prefix_old t =
+      debug "Container: prefix: call";
+
+      debug
+        "Container: prefix: t:\n%s"
+        (to_string
+           t
+        );
+
+      let result =
+        if Unsigned_int_set.cardinal t.data = 0 then
+          Prefix.make
+            Prefix.max_size
+            Ip_address.null
+        else
+          let first_ipaddr = Unsigned_int_set.min_elt t.data in
           let other_ipaddr_set = Unsigned_int_set.remove first_ipaddr t.data in
 
           let first_ip_address =
@@ -919,7 +961,7 @@ struct
 
       result
 
-    let prefix_old t =
+    let prefix_old_2 t =
       debug "Container: prefix: call";
 
       debug
