@@ -95,37 +95,6 @@ let prefix t =
       (Ip_address_data_structures_V6.Container.prefix
          container
       )
-      
-let prefix_old t =
-  match t with
-  | Empty -> raise (Invalid_argument "[Ip_address_container]: prefix: Empty")
-  | V4 container ->
-    Ipaddr.V4
-      (Ip_address_data_structures_V4.Container.prefix_old
-         container
-      )
-  | V6 container ->
-    Ipaddr.V6
-      (Ip_address_data_structures_V6.Container.prefix_old
-         container
-      )
-      
-let prefix_old_2 t =
-  match t with
-  | Empty -> raise (Invalid_argument "[Ip_address_container]: prefix: Empty")
-  | V4 container ->
-    Ipaddr.V4
-      (Ip_address_data_structures_V4.Container.prefix_old_2
-         container
-      )
-  | V6 container ->
-    Ipaddr.V6
-      (Ip_address_data_structures_V6.Container.prefix_old_2
-         container
-      )
-      
-
-
 
 let of_ip_address_container_compact container_compact =
   match container_compact with
