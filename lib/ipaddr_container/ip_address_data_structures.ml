@@ -778,40 +778,35 @@ struct
       new_t
         (Unsigned_int_set.filter
            (fun uint ->
-              let ip_address = Ip_address.of_unsigned_int uint in
-              let mem = Prefix.mem ip_address prefix in
+              (* let ip_address = Ip_address.of_unsigned_int uint in *)
+              (* let mem = Prefix.mem ip_address prefix in *)
 
               let mem_b = Unsigned_int.compare lb uint <= 0 && Unsigned_int.compare uint ub <= 0 in
-              if mem <> mem_b then
-                (
-                  print_endline
-                    (sprintf
-                       "filter_prefix: t:\n%s"
-                       (to_string t)
-                    );
-                  print_endline
-                    (sprintf
-                       "filter_prefix: inconsistency for %s in %s:\nPrefix.mem %b\n<>\nbound mem %b: between %s and %s - %s <= %s <= %s"
-                       (Ip_address.to_string ip_address)
-                       (Prefix.to_string prefix)
+              (* if mem <> mem_b then *)
+              (*   ( *)
+              (*     print_endline *)
+              (*       (sprintf *)
+              (*          "filter_prefix: t:\n%s" *)
+              (*          (to_string t) *)
+              (*       ); *)
+              (*     print_endline *)
+              (*       (sprintf *)
+              (*          "filter_prefix: inconsistency for %s in %s:\nPrefix.mem %b\n<>\nbound mem %b: between %s and %s - %s <= %s <= %s" *)
+              (*          (Ip_address.to_string ip_address) *)
+              (*          (Prefix.to_string prefix) *)
                        
-                       mem
+              (*          mem *)
 
-                       mem_b
-                       (Ip_address.to_string network)
-                       (* (Unsigned_int.to_string lb) *)
+              (*          mem_b *)
+              (*          (Ip_address.to_string network) *)
                        
-                       (Ip_address.to_string broadcast)
-                       (* (Unsigned_int.to_string ub) *)
-                       (* (string_of_int (Unsigned_int.to_int lb)) *)
-                       (* (string_of_int (Unsigned_int.to_int uint)) *)
-                       (* (string_of_int (Unsigned_int.to_int ub)) *)
-                       (Unsigned_int.to_string lb)
-                       (Unsigned_int.to_string uint)
-                       (Unsigned_int.to_string ub)
-                    );
-                  assert(false)
-                );
+              (*          (Ip_address.to_string broadcast) *)
+              (*          (Unsigned_int.to_string lb) *)
+              (*          (Unsigned_int.to_string uint) *)
+              (*          (Unsigned_int.to_string ub) *)
+              (*       ); *)
+              (*     assert(false) *)
+              (*   ); *)
               mem_b
            )
            t.data
