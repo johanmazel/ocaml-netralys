@@ -872,181 +872,6 @@ struct
 
       result
 
-    (* let prefix_old t = *)
-    (*   debug "Container: prefix: call"; *)
-
-    (*   debug *)
-    (*     "Container: prefix: t:\n%s" *)
-    (*     (to_string *)
-    (*        t *)
-    (*     ); *)
-
-    (*   let result = *)
-    (*     if Unsigned_int_set.cardinal t.data = 0 then *)
-    (*       Prefix.make *)
-    (*         Prefix.max_size *)
-    (*         Ip_address.null *)
-    (*     else *)
-    (*       let first_ipaddr = Unsigned_int_set.min_elt t.data in *)
-    (*       let other_ipaddr_set = Unsigned_int_set.remove first_ipaddr t.data in *)
-
-    (*       let first_ip_address = *)
-    (*         Ip_address.of_unsigned_int *)
-    (*           first_ipaddr           *)
-    (*       in *)
-
-    (*       debug "Container: prefix: t length: %d" (Unsigned_int_set.cardinal t.data); *)
-
-    (*       debug "Container: prefix: building prefix with prefix intersection"; *)
-
-    (*       let prefix = *)
-    (*         Unsigned_int_set.fold *)
-    (*           (fun unsigned_int prefix_acc -> *)
-    (*              let ip_address = *)
-    (*                Ip_address.of_unsigned_int *)
-    (*                  unsigned_int *)
-    (*              in *)
-
-    (*              debug *)
-    (*                "Container: prefix: ip_address: %s ; prefix_acc: %s" *)
-    (*                (Ip_address.to_string *)
-    (*                   ip_address *)
-    (*                ) *)
-    (*                (Prefix.to_string *)
-    (*                   prefix_acc *)
-    (*                ); *)
-
-    (*              if Prefix.mem ip_address prefix_acc then *)
-    (*                prefix_acc *)
-    (*              else *)
-    (*                let prefix_ip_address = *)
-    (*                  Prefix.network_address *)
-    (*                    prefix_acc *)
-    (*                    Ip_address.null *)
-    (*                in *)
-
-    (*                debug *)
-    (*                  "Container: prefix: prefix ip_address: %s" *)
-    (*                  (Ip_address.to_string *)
-    (*                     prefix_ip_address *)
-    (*                  ); *)
-
-    (*                let common_prefix = *)
-    (*                  Prefix_utils.common_prefix_between_ipaddr *)
-    (*                    ip_address *)
-    (*                    prefix_ip_address *)
-    (*                in *)
-
-    (*                debug *)
-    (*                  "Container: prefix: common prefix: %s" *)
-    (*                  (Prefix.to_string *)
-    (*                     common_prefix *)
-    (*                  ); *)
-
-    (*                common_prefix *)
-    (*           ) *)
-    (*           other_ipaddr_set *)
-    (*           (Prefix.make *)
-    (*              Prefix.max_size *)
-    (*              first_ip_address *)
-    (*           ) *)
-    (*       in *)
-
-    (*       debug "Container: prefix: prefix: %s" (Prefix.to_string prefix); *)
-
-    (*       prefix *)
-    (*   in *)
-
-    (*   debug "Container: prefix: end"; *)
-
-    (*   result *)
-
-    (* let prefix_old_2 t = *)
-    (*   debug "Container: prefix: call"; *)
-
-    (*   debug *)
-    (*     "Container: prefix: t:\n%s" *)
-    (*     (to_string *)
-    (*        t *)
-    (*     ); *)
-
-    (*   let result = *)
-    (*     if Unsigned_int_set.cardinal t.data = 0 then *)
-    (*       Prefix.make *)
-    (*         Prefix.max_size *)
-    (*         Ip_address.null *)
-    (*     else *)
-    (*       let first_ipaddr = Unsigned_int_set.min_elt t.data in *)
-    (*       let other_ipaddr_set = Unsigned_int_set.remove first_ipaddr t.data in *)
-
-    (*       let first_ip_address = *)
-    (*         Ip_address.of_unsigned_int *)
-    (*           first_ipaddr           *)
-    (*       in *)
-
-    (*       debug "Container: prefix: t length: %d" (Unsigned_int_set.cardinal t.data); *)
-
-    (*       debug "Container: prefix: building prefix with prefix intersection"; *)
-
-    (*       let prefix = *)
-    (*         Unsigned_int_set.fold *)
-    (*           (fun unsigned_int prefix_acc -> *)
-    (*              let ip_address = *)
-    (*                Ip_address.of_unsigned_int *)
-    (*                  unsigned_int *)
-    (*              in *)
-
-    (*              debug *)
-    (*                "Container: prefix: ip_address: %s ; prefix_acc: %s" *)
-    (*                (Ip_address.to_string *)
-    (*                   ip_address *)
-    (*                ) *)
-    (*                (Prefix.to_string *)
-    (*                   prefix_acc *)
-    (*                ); *)
-
-    (*              let prefix_ip_address = *)
-    (*                Prefix.network_address *)
-    (*                  prefix_acc *)
-    (*                  Ip_address.null *)
-    (*              in *)
-
-    (*              debug *)
-    (*                "Container: prefix: prefix ip_address: %s" *)
-    (*                (Ip_address.to_string *)
-    (*                   prefix_ip_address *)
-    (*                ); *)
-
-    (*              let common_prefix = *)
-    (*                Prefix_utils.common_prefix_between_ipaddr *)
-    (*                  ip_address *)
-    (*                  prefix_ip_address *)
-    (*              in *)
-
-    (*              debug *)
-    (*                "Container: prefix: common prefix: %s" *)
-    (*                (Prefix.to_string *)
-    (*                   common_prefix *)
-    (*                ); *)
-
-    (*              common_prefix *)
-    (*           ) *)
-    (*           other_ipaddr_set *)
-    (*           (Prefix.make *)
-    (*              Prefix.max_size *)
-    (*              first_ip_address *)
-    (*           ) *)
-    (*       in *)
-
-    (*       debug "Container: prefix: prefix: %s" (Prefix.to_string prefix); *)
-
-    (*       prefix *)
-    (*   in *)
-
-    (*   debug "Container: prefix: end"; *)
-
-    (*   result *)
-
     let prefix_list size t =
       let prefix_set_init = Prefix_set.empty in
 
@@ -1071,49 +896,8 @@ struct
       L.length
         (prefix_list size t)
         
-    (* let number_prefix size t = *)
-    (*   let prefix_set_init = Prefix_set.empty in *)
-
-    (*   let prefix_set = *)
-    (*     Unsigned_int_set.fold *)
-    (*       (fun ipaddr prefix_set_acc -> *)
-    (*          let ip_address = *)
-    (*            Ip_address.of_unsigned_int ipaddr *)
-    (*          in *)
-    (*          let prefix = Prefix.make size ip_address in *)
-    (*          Prefix_set.add *)
-    (*            prefix *)
-    (*            prefix_set_acc *)
-    (*       ) *)
-    (*       t.data *)
-    (*       prefix_set_init *)
-    (*   in *)
-
-    (*   Prefix_set.cardinal prefix_set *)
-
-    (* Deprecated *)
-    let number_24_prefix t =
-      let prefix_set_init = Prefix_set.empty in
-
-      let prefix_set =
-        Unsigned_int_set.fold
-          (fun uint prefix_set_acc ->
-             let ip_address =
-               Ip_address.of_unsigned_int uint
-             in
-             let prefix = Prefix.make 24 ip_address in
-             Prefix_set.add
-               prefix
-               prefix_set_acc
-          )
-          t.data
-          prefix_set_init
-      in
-
-      Prefix_set.cardinal prefix_set
-
     let nth_bit_zero bit_indice t =
-      debug "nth_bit_zero: call";
+      (* debug "nth_bit_zero: call"; *)
       
       assert(bit_indice > 0);
       let unsigned_int_set_zero =
@@ -1133,19 +917,19 @@ struct
                  (Ip_address.to_unsigned_int network_small)
              in
 
-             debug
-               "nth_bit_zero: ip_address: %s ; bit_indice: %d ; prefix_small: %s ; prefix_current: %s"
-               (Ip_address.to_string ip_address)
-               bit_indice
-               (Prefix.to_string prefix_small)
-               (Prefix.to_string prefix_current)
-             ;
-             debug
-               "nth_bit_zero: network_small: %s ; network_current: %s ; diff: %d"
-               (Ip_address.to_string network_small)
-               (Ip_address.to_string network_current)
-               (Unsigned_int.to_int diff)
-             ;
+             (* debug *)
+             (*   "nth_bit_zero: ip_address: %s ; bit_indice: %d ; prefix_small: %s ; prefix_current: %s" *)
+             (*   (Ip_address.to_string ip_address) *)
+             (*   bit_indice *)
+             (*   (Prefix.to_string prefix_small) *)
+             (*   (Prefix.to_string prefix_current) *)
+             (* ; *)
+             (* debug *)
+             (*   "nth_bit_zero: network_small: %s ; network_current: %s ; diff: %d" *)
+             (*   (Ip_address.to_string network_small) *)
+             (*   (Ip_address.to_string network_current) *)
+             (*   (Unsigned_int.to_int diff) *)
+             (* ; *)
 
              let is_zero =
                Unsigned_int.compare
@@ -1175,7 +959,7 @@ struct
           unsigned_int_set_zero
       in
 
-      debug "nth_bit_zero: end";
+      (* debug "nth_bit_zero: end"; *)
       
       r
     
