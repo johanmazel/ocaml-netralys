@@ -170,13 +170,13 @@ Executable test_main
                  jl,
                  netralys_packet_data,
                  netralys_ipaddr_container
-  CompiledObject: best
-  BuildTools:     ocamlbuild
+#  CompiledObject: best
+#  BuildTools:     ocamlbuild
   Install:        false
 
 Test test_main
   WorkingDirectory: tests/
-  Command: $test_main
+  Command: ./test_main.native
   Run: true
 
 
