@@ -760,11 +760,17 @@ struct
         prefix
         t
       =
+      let lb = Ip_address.to_unsigned_int (Prefix.broadcast prefix) in
+      let ub = Ip_address.to_unsigned_int (Prefix.network prefix) in
       new_t
         (Unsigned_int_set.filter
            (fun uint ->
               let ip_address = Ip_address.of_unsigned_int uint in
-              Prefix.mem ip_address prefix
+              let mem = Prefix.mem ip_address prefix in
+
+              let mem_b = lb <= uint && uint <= ub in
+              assert(mem = mem_b);
+              mem_b
            )
            t.data
         )
