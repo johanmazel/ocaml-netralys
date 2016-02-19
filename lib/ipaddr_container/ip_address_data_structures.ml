@@ -30,7 +30,7 @@ module type BIN_INT = sig
   type t
 
   val compare : t -> t -> int
-
+    
   val of_int32 : int32 -> t
   val of_int64_tuple : int64 -> int64 -> t
   val to_int : t -> int
@@ -63,6 +63,8 @@ module type UNSIGNED_INT = sig
 
   val compare : t -> t -> int
 
+  val to_string : t -> string
+    
   val min : t
   val max : t
 
@@ -92,6 +94,7 @@ module type IP_ADDRESS = sig
 
   val compare : t -> t -> int
   val to_string : t -> string
+  val of_ipaddr : Ipaddr.t -> t
   val to_ipaddr : t -> Ipaddr.t
 
   end
@@ -705,6 +708,14 @@ struct
     let to_list t = 
       Unsigned_int_set.to_list t.data
 
+    let of_ipaddr_list ipaddr_l =
+      let unsigned_int_l = 
+        L.map
+          (fun ipaddr -> Ip_address.to_unsigned_int (Ip_address.of_ipaddr ipaddr))
+          ipaddr_l
+      in
+      of_list unsigned_int_l
+
     let to_ipaddr_list t =
       let unsigned_int_l = to_list t in
       L.map
@@ -760,16 +771,47 @@ struct
         prefix
         t
       =
-      let lb = Ip_address.to_unsigned_int (Prefix.broadcast prefix) in
-      let ub = Ip_address.to_unsigned_int (Prefix.network prefix) in
+      let broadcast = Prefix.broadcast prefix in
+      let network = Prefix.network prefix in
+      let lb = Ip_address.to_unsigned_int network in
+      let ub = Ip_address.to_unsigned_int broadcast in
       new_t
         (Unsigned_int_set.filter
            (fun uint ->
               let ip_address = Ip_address.of_unsigned_int uint in
               let mem = Prefix.mem ip_address prefix in
 
-              let mem_b = lb <= uint && uint <= ub in
-              assert(mem = mem_b);
+              let mem_b = Unsigned_int.compare lb uint <= 0 && Unsigned_int.compare uint ub <= 0 in
+              if mem <> mem_b then
+                (
+                  print_endline
+                    (sprintf
+                       "filter_prefix: t:\n%s"
+                       (to_string t)
+                    );
+                  print_endline
+                    (sprintf
+                       "filter_prefix: inconsistency for %s in %s:\nPrefix.mem %b\n<>\nbound mem %b: between %s and %s - %s <= %s <= %s"
+                       (Ip_address.to_string ip_address)
+                       (Prefix.to_string prefix)
+                       
+                       mem
+
+                       mem_b
+                       (Ip_address.to_string network)
+                       (* (Unsigned_int.to_string lb) *)
+                       
+                       (Ip_address.to_string broadcast)
+                       (* (Unsigned_int.to_string ub) *)
+                       (* (string_of_int (Unsigned_int.to_int lb)) *)
+                       (* (string_of_int (Unsigned_int.to_int uint)) *)
+                       (* (string_of_int (Unsigned_int.to_int ub)) *)
+                       (Unsigned_int.to_string lb)
+                       (Unsigned_int.to_string uint)
+                       (Unsigned_int.to_string ub)
+                    );
+                  assert(false)
+                );
               mem_b
            )
            t.data

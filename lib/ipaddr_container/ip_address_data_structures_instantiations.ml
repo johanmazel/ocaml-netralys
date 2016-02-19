@@ -25,6 +25,7 @@ module Unsigned_int_V4 = struct
   with compare
 
   (* let compare_unsigned_int = Uint32.compare *)
+  let to_string = Uint32.to_string
 
   let min = Uint32.min_int
   let max = Uint32.max_int
@@ -53,7 +54,11 @@ module Ip_address_V4 = struct
   let to_unsigned_int t = Uint32.of_int32 (Ipaddr.V4.to_int32 t)
       
   let to_string = Ipaddr.V4.to_string
-  let to_ipaddr t = Ipaddr.V4 t      
+  let of_ipaddr ipaddr =
+    match ipaddr with
+    | Ipaddr.V4 ipaddr -> ipaddr 
+    | Ipaddr.V6 ipaddr -> failwith "Unexpected input in of_ipaddr v6 instead of v4"
+  let to_ipaddr t = Ipaddr.V4 t
 end
   
 module Prefix_V4 = struct
@@ -139,6 +144,8 @@ module Unsigned_int_V6 = struct
   (* let compare_unsigned_int = Uint128_custom.compare *)
   let compare = Uint128_custom.compare
 
+  let to_string = Uint128_custom.to_string
+                    
   let min = Uint128_custom.min_int
   let max = Uint128_custom.max_int
 
@@ -193,6 +200,11 @@ module Ip_address_V6 = struct
          d
       
   let to_string ip_address = Ipaddr.V6.to_string ~v4: false ip_address
+      
+  let of_ipaddr ipaddr =
+    match ipaddr with
+    | Ipaddr.V4 ipaddr -> failwith "Unexpected input in of_ipaddr v4 instead of v6" 
+    | Ipaddr.V6 ipaddr -> ipaddr
   let to_ipaddr t = Ipaddr.V6 t
 end
 

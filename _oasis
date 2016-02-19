@@ -153,5 +153,30 @@ Library netralys_ipaddr_container
                  netralys_packet_data
 
 
+Executable test_main
+  Path:           tests/
+  MainIs:         test_main.ml
+  BuildDepends:     
+                 ipaddr,
+                 uint,
+                 gsl,
+                 oUnit,
+
+                 comparelib,
+                 comparelib.syntax,
+                 pa_sexp_conv,
+                 pa_bin_prot,
+
+                 jl,
+                 netralys_packet_data,
+                 netralys_ipaddr_container
+  CompiledObject: best
+  BuildTools:     ocamlbuild
+  Install:        false
+
+Test test_main
+  WorkingDirectory: tests/
+  Command: $test_main
+  Run: true
 
 
