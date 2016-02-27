@@ -781,6 +781,7 @@ struct
               (* let ip_address = Ip_address.of_unsigned_int uint in *)
               (* let mem = Prefix.mem ip_address prefix in *)
 
+              (* let mem_b = Unsigned_int.compare lb uint <= 0 && Unsigned_int.compare uint ub <= 0 in *)
               let mem_b = Unsigned_int.compare lb uint <= 0 && Unsigned_int.compare uint ub <= 0 in
               (* if mem <> mem_b then *)
               (*   ( *)
@@ -1058,7 +1059,7 @@ struct
           array_sorted
           0.5
       in
-      let med_int = int_of_float med in
+      (* let med_int = int_of_float med in *)
 
       let _90centile =
         Gsl.Stats.quantile_from_sorted_data
@@ -1087,7 +1088,7 @@ struct
       in
       let _max_int = int_of_float _max in
 
-      (mean, med_int, _90centile_int, _95centile_int, _99centile_int, _max_int)
+      (mean, med, _90centile_int, _95centile_int, _99centile_int, _max_int)
 
     let get_consecutiveness_empty_run_length_std_mean_med_centiles_max
         t
