@@ -152,11 +152,11 @@ let union t1 t2 =
   | V6 _, V4 _ -> raise (Invalid_argument "[Ip_address_container]: union: IPv6 and IPv4")
 
 
-let get_consecutiveness_empty_run_length_std_mean_med_centiles_max t =
+let get_consecutiveness_empty_run_length_mean_std_med_centiles_max t =
   match t with
   | Empty -> raise (Invalid_argument "[Ip_address_container:] get_consecutiveness_empty_run_length_std_mean_med_centiles_max: Empty")
-  | V4 container -> Ip_address_data_structures_V4.Container.get_consecutiveness_empty_run_length_std_mean_med_centiles_max container
-  | V6 container -> Ip_address_data_structures_V6.Container.get_consecutiveness_empty_run_length_std_mean_med_centiles_max container
+  | V4 container -> Ip_address_data_structures_V4.Container.get_consecutiveness_empty_run_length_mean_std_med_centiles_max container
+  | V6 container -> Ip_address_data_structures_V6.Container.get_consecutiveness_empty_run_length_mean_std_med_centiles_max container
 
 let consecutive_number t =
   match t with

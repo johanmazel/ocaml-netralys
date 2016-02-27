@@ -1090,7 +1090,7 @@ struct
 
       (mean, med, _90centile_int, _95centile_int, _99centile_int, _max_int)
 
-    let get_consecutiveness_empty_run_length_std_mean_med_centiles_max
+    let get_consecutiveness_empty_run_length_mean_std_med_centiles_max
         t
       =
       let _, consecutive_number, empty_run_length_list =
@@ -1146,7 +1146,7 @@ struct
           )
       in
       
-      (consecutiveness_ratio, (sd, mean, med), (_90centile, _95centile, _99centile, max))
+      (consecutiveness_ratio, (mean, sd, med), (_90centile, _95centile, _99centile, max))
 
     let coverage_min_max
         t
