@@ -81,11 +81,11 @@ let pdu_t_of_ipv4
           | 47 ->
             Ipv4_data_for_metrics.GRE
           | _ ->
-            Ipv4_data_for_metrics.Other (-1)
+            Ipv4_data_for_metrics.Other protocol_code
         )
     )
   with
-  | exn -> Ipv4_data_for_metrics.Other (-2)
+  | exn -> Ipv4_data_for_metrics.Other (-1)
 
 
 let env = Mpl_stdlib.new_env (String.make 2000 '\000');;
@@ -153,7 +153,7 @@ let pdu_t_of_ipv6
         Ipv6_data_for_metrics.ICMP6 icmp6_data_for_metrics
       )
     | _ ->
-      Ipv6_data_for_metrics.Other (-1)
+      Ipv6_data_for_metrics.Other ip6_pdu.Ip6.Pdu.proto
   in
 
   ipv6_data_for_metrics_pdu_t
