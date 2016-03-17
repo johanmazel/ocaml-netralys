@@ -1,13 +1,16 @@
 
 open Printf
 
+module L = List_ext
+     
 type t =
-| ICMP of Icmp_metrics.t
-| TCP of Five_tuple_flow_tcp_metrics.t
-| UDP of Five_tuple_flow_udp_metrics.t
-| IPv6 of Five_tuple_flow_ipv6_metrics.t
-| GRE of Five_tuple_flow_gre_metrics.t
-| ICMPv6 of Icmpv6_metrics.t
+  | ICMP of Icmp_metrics.t
+  | TCP of Five_tuple_flow_tcp_metrics.t
+  | UDP of Five_tuple_flow_udp_metrics.t
+  | IPv6 of Five_tuple_flow_ipv6_metrics.t
+  | GRE of Five_tuple_flow_gre_metrics.t
+  | ICMPv6 of Icmpv6_metrics.t
+  | Other of int list ref
 
 let to_string t =
   match t with
@@ -29,6 +32,7 @@ let to_string t =
   | ICMPv6 icmpv6_metrics -> 
     Icmpv6_metrics.to_string
       icmpv6_metrics
+  | Other l_ref -> L.to_string string_of_int !l_ref
 
 let verify nb_packets error_string t =
   match t with
@@ -62,6 +66,7 @@ let verify nb_packets error_string t =
       nb_packets
       error_string
       icmpv6_metrics
+  | Other code -> ()
       
 let to_int t = 
   match t with
@@ -71,33 +76,35 @@ let to_int t =
   | IPv6 _ -> 3
   | GRE _ -> 4
   | ICMPv6 _ -> 5
+  | Other l_ref -> L.hd !l_ref
 
 let copy t =
   match t with
   | ICMP icmp_metrics -> 
     ICMP
       (Icmp_metrics.copy
-   icmp_metrics)
+         icmp_metrics)
   | TCP five_tuple_flow_tcp_metrics -> 
     TCP 
       (Five_tuple_flow_tcp_metrics.copy
-   five_tuple_flow_tcp_metrics)
+         five_tuple_flow_tcp_metrics)
   | UDP five_tuple_flow_udp_metrics -> 
     UDP
       (Five_tuple_flow_udp_metrics.copy
-   five_tuple_flow_udp_metrics)
+         five_tuple_flow_udp_metrics)
   | IPv6 five_tuple_flow_ipv6_metrics -> 
     IPv6
       (Five_tuple_flow_ipv6_metrics.copy
-   five_tuple_flow_ipv6_metrics)
+         five_tuple_flow_ipv6_metrics)
   | GRE five_tuple_flow_gre_metrics -> 
     GRE
       (Five_tuple_flow_gre_metrics.copy
-   five_tuple_flow_gre_metrics)
+         five_tuple_flow_gre_metrics)
   | ICMPv6 icmpv6_metrics -> 
     ICMPv6
       (Icmpv6_metrics.copy
-   icmpv6_metrics)
+         icmpv6_metrics)
+  | Other code -> Other code
 
 (* TODO: change names *)
 let fusion t t_to_append =
@@ -119,6 +126,8 @@ let fusion t t_to_append =
        failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_icmp_metrics and five_tuple_flow_gre_metrics"
      | ICMPv6 _ ->
        failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_icmp_metrics and five_tuple_flow_icmpv6_metrics"
+     | Other _ ->
+       failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_icmp_metrics and five_tuple_flow_other"
     )
   | TCP five_tuple_flow_tcp_metrics_1 -> 
     (match t_to_append with
@@ -137,6 +146,8 @@ let fusion t t_to_append =
        failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_tcp_metrics and five_tuple_flow_gre_metrics"
      | ICMPv6 _ ->
        failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_tcp_metrics and five_tuple_flow_icmpv6_metrics"
+     | Other _ ->
+       failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_tcp_metrics and five_tuple_flow_other"
     )
   | UDP five_tuple_flow_udp_metrics_1 -> 
     (match t_to_append with
@@ -155,6 +166,8 @@ let fusion t t_to_append =
        failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_udp_metrics and five_tuple_flow_gre_metrics"
      | ICMPv6 _ ->
        failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_udp_metrics and five_tuple_flow_icmpv6_metrics"
+     | Other _ ->
+       failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_udp_metrics and five_tuple_flow_other"
     )
   | IPv6 five_tuple_flow_ipv6_metrics_1 -> 
     (match t_to_append with
@@ -173,6 +186,8 @@ let fusion t t_to_append =
        failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_ipv6_metrics and five_tuple_flow_gre_metrics"
      | ICMPv6 _ ->
        failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_ipv6_metrics and five_tuple_flow_icmpv6_metrics"
+     | Other _ ->
+       failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_ipv6_metrics and five_tuple_flow_other"
     )
   | GRE five_tuple_flow_gre_metrics_1 -> 
     (match t_to_append with
@@ -191,6 +206,8 @@ let fusion t t_to_append =
             five_tuple_flow_gre_metrics_2)
      | ICMPv6 _ ->
        failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_gre_metrics and five_tuple_flow_icmpv6_metrics"
+     | Other _ ->
+       failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_gre_metrics and five_tuple_flow_other"
     )
   | ICMPv6 icmpv6_metrics -> 
     (match t_to_append with
@@ -209,6 +226,25 @@ let fusion t t_to_append =
          (Icmpv6_metrics.fusion
             icmpv6_metrics
             icmpv6_metrics_2)
+     | Other _ ->
+       failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_icmpv6_metrics and five_tuple_flow_other"
+    )
+  | Other code -> 
+    (match t_to_append with
+     | ICMP _ ->
+       failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_other and five_tuple_flow_icmp_metrics"
+     | TCP _ ->
+       failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_other and five_tuple_flow_tcp_metrics"
+     | UDP _ ->
+       failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_other and five_tuple_flow_udp_metrics"
+     | IPv6 _ ->
+       failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_other and five_tuple_flow_ipv6_metrics"
+     | GRE _ ->
+       failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_other and five_tuple_flow_gre_metrics"
+     | ICMPv6 _ ->
+       failwith "Transport_layer_metrics: fusion cannot fusion five_tuple_flow_other and five_tuple_flow_icmpv6_metrics"
+     | Other code ->
+       Other code
     )
     
 (* let fusion t_1 t_2 = *)
@@ -378,6 +414,8 @@ let update
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding ICMP packet to GRE flow"
           | ICMPv6 _ ->
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding ICMP packet to ICMPv6 flow"
+          | Other _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding ICMP packet to Other flow"
         )
       | Ipv4_data_for_metrics.TCP tcp_for_metrics ->
         (
@@ -395,6 +433,8 @@ let update
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding TCP packet to GRE flow"
           | ICMPv6 _ ->
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding TCP packet to ICMPv6 flow"
+          | Other _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding TCP packet to Other flow"
         )
       | Ipv4_data_for_metrics.UDP udp_for_metrics ->
         (
@@ -418,6 +458,8 @@ let update
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding UDP packet to GRE flow"
           | ICMPv6 _ ->
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding UDP packet to ICMPv6 flow"
+          | Other _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding UDP packet to Other flow"
         )
       | Ipv4_data_for_metrics.IPv6 ipv6_data_for_metrics ->
         (
@@ -434,6 +476,8 @@ let update
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding IPv6 packet to GRE flow"
           | ICMPv6 _ ->
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding IPv6 packet to ICMPv6 flow"
+          | Other _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding IPv6 packet to Other flow"
         )
       | Ipv4_data_for_metrics.GRE ->
         (
@@ -450,6 +494,8 @@ let update
             Five_tuple_flow_gre_metrics.update five_tuple_flow_gre_metrics;
           | ICMPv6 _ ->
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding GRE packet to ICMPv6 flow"
+          | Other _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding GRE packet to Other flow"
         )
       | Ipv4_data_for_metrics.Other protocol_number ->
         exit 11
@@ -472,6 +518,8 @@ let update
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding ICMP packet to GRE flow"
           | ICMPv6 _ ->
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding ICMP packet to ICMPv6 flow"
+          | Other _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding ICMP packet to Other flow"
         )
       | Ipv6_data_for_metrics.TCP tcp_for_metrics ->
         (
@@ -488,6 +536,8 @@ let update
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding TCP packet to GRE flow"
           | ICMPv6 _ ->
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding TCP packet to ICMPv6 flow"
+          | Other _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding TCP packet to Other flow"
         )
       | Ipv6_data_for_metrics.UDP udp_for_metrics ->
         (
@@ -510,6 +560,8 @@ let update
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding UDP packet to GRE flow"
           | ICMPv6 _ ->
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding UDP packet to ICMPv6 flow"
+          | Other _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding UDP packet to Other flow"
         )
       | Ipv6_data_for_metrics.GRE ->
         (
@@ -526,25 +578,45 @@ let update
             Five_tuple_flow_gre_metrics.update five_tuple_flow_gre_metrics;
           | ICMPv6 _ ->
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding GRE packet to ICMPv6 flow"
+          | Other _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding GRE packet to Other flow"
         )
       | Ipv6_data_for_metrics.ICMP6 icmp6_data_for_metrics ->
         (
           match t with
           | ICMP _ ->
-            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding GRE packet to ICMP flow"
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding ICMP6 packet to ICMP flow"
           | TCP _ ->
-            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding GRE packet to TCP flow"
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding ICMP6 packet to TCP flow"
           | UDP _ ->
-            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding GRE packet to UDP flow"
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding ICMP6 packet to UDP flow"
           | IPv6 _ ->
-            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding GRE packet to IPv6 flow"
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding ICMP6 packet to IPv6 flow"
           | GRE five_tuple_flow_gre_metrics ->
-            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding GRE packet to ICMPv6 flow"
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding ICMP6 packet to GRE flow"
           | ICMPv6 icmpv6_metrics ->
             Icmpv6_metrics.update_icmpv6_data_for_metrics icmpv6_metrics icmp6_data_for_metrics;
+          | Other _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding ICMP6 packet to Other flow"
         )
       | Ipv6_data_for_metrics.Other protocol_number ->
-        exit 11
+        (
+          match t with
+          | ICMP _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding Other packet to ICMP flow"
+          | TCP _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding Other packet to TCP flow"
+          | UDP _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding Other packet to UDP flow"
+          | IPv6 _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding Other packet to IPv6 flow"
+          | GRE five_tuple_flow_gre_metrics ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding Other packet to GRE flow"
+          | ICMPv6 icmpv6_metrics ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding Other packet to ICMPv6 flow"
+          | Other l_ref ->
+            l_ref := L.append [ protocol_number ] !l_ref;
+        )
     )
   | Packet_data_for_metrics.Other ->
     exit 12
