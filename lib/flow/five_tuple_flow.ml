@@ -98,8 +98,12 @@ let of_packet_data_for_metrics
               0
               0
           )
-        | Ipv4_data_for_metrics.Other code -> 
-          failwith "Five_tuple_flow: of_packet_data_for_metrics: unexpected protocol over IP"
+        | Ipv4_data_for_metrics.Other code  -> 
+          failwith
+            (sprintf
+               "Five_tuple_flow: of_packet_data_for_metrics: unexpected protocol over IP: %d"
+               code
+            )
       )
     | Packet_data_for_metrics.IPV6 ipv6_for_metrics ->
       (
