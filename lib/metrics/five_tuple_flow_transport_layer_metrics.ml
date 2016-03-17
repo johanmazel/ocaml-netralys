@@ -337,7 +337,8 @@ let of_packet_data_for_metrics
             Five_tuple_flow_gre_metrics.update five_tuple_flow_gre_metrics;
             GRE five_tuple_flow_gre_metrics
           )
-        | Ipv4_data_for_metrics.Other protocol_number -> assert(false)
+        | Ipv4_data_for_metrics.Other protocol_number ->
+          Other (ref [ protocol_number ])
       )
     | Packet_data_for_metrics.IPV6 ipv6_data_for_metrics ->
       (
@@ -379,7 +380,8 @@ let of_packet_data_for_metrics
             Icmpv6_metrics.update_icmpv6_data_for_metrics icmpv6_metrics icmpv6_data_for_metrics;
             ICMPv6 icmpv6_metrics            
           )
-        | Ipv6_data_for_metrics.Other protocol_number -> assert(false)
+        | Ipv6_data_for_metrics.Other protocol_number ->
+          Other (ref [ protocol_number ])          
       )
     (* | Packet_data_for_metrics.IP _ -> assert(false) *)
     | Packet_data_for_metrics.Other -> assert(false)
