@@ -1,11 +1,11 @@
 
 type pdu_t =
-| ICMP of Icmp_data_for_metrics.t
-| TCP of Tcp_data_for_metrics.t
-| UDP of Udp_data_for_metrics.t
-| IPv6 of Ipv6_data_for_metrics.t
-| GRE
-| Other of int
+  | ICMP of Icmp_data_for_metrics.t
+  | TCP of Tcp_data_for_metrics.t
+  | UDP of Udp_data_for_metrics.t
+  | IPv6 of Ipv6_data_for_metrics.t
+  | GRE
+  | Other of int
 
 type t =
   {
