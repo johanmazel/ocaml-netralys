@@ -24,5 +24,5 @@ let launch_function_on_header_ethernet
 
       with
       | Ethernet.Ethernet.Bad_packet message_string -> ()
-      | exn -> ()
+      (* | exn -> () *)
     )
