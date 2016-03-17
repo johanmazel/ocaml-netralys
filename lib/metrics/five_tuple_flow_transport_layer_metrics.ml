@@ -104,7 +104,8 @@ let copy t =
     ICMPv6
       (Icmpv6_metrics.copy
          icmpv6_metrics)
-  | Other code -> Other code
+  | Other code ->
+    Other code
 
 (* TODO: change names *)
 let fusion t t_to_append =
@@ -381,7 +382,7 @@ let of_packet_data_for_metrics
             ICMPv6 icmpv6_metrics            
           )
         | Ipv6_data_for_metrics.Other protocol_number ->
-          Other (ref [ protocol_number ])          
+          Other (ref [ protocol_number ])
       )
     (* | Packet_data_for_metrics.IP _ -> assert(false) *)
     | Packet_data_for_metrics.Other -> assert(false)
@@ -500,7 +501,23 @@ let update
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding GRE packet to Other flow"
         )
       | Ipv4_data_for_metrics.Other protocol_number ->
-        exit 11
+        (
+          match t with
+          | ICMP _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding Other packet to ICMP flow"
+          | TCP _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding Other packet to TCP flow"
+          | UDP _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding Other packet to UDP flow"
+          | IPv6 _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding Other packet to IPv6 flow"
+          | GRE five_tuple_flow_gre_metrics ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding Other packet to GRE flow"
+          | ICMPv6 _ ->
+            failwith "Five_tuple_flow_detailed_metrics: update_melange: adding Other packet to ICMPv6 flow"
+          | Other l_ref ->
+            l_ref := L.append [ protocol_number ] !l_ref;
+        )
     )
   | Packet_data_for_metrics.IPV6 ipv6_data_for_metrics ->
     (
@@ -554,7 +571,7 @@ let update
 
               false
               false
-              
+
               udp_for_metrics;
           | IPv6 _ ->
             failwith "Five_tuple_flow_detailed_metrics: update_melange: adding UDP packet to IPv6 flow"
