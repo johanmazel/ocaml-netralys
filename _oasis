@@ -91,6 +91,7 @@ Library netralys_metrics
                  Five_tuple_flow_tcp_metrics,
                  Five_tuple_flow_udp_metrics,
                  Five_tuple_flow_gre_metrics,
+                 Five_tuple_flow_other_protocol_metrics,
 
                  Detailed_metrics,
                  Network_traffic_metric_instantiations,
@@ -99,6 +100,7 @@ Library netralys_metrics
                  Tcp_metrics,
                  Udp_metrics,
                  Gre_metrics,
+                 Other_protocol_metrics,
                  Icmp_metrics,
                  Icmpv6_metrics,
                  Icmp_du_metrics,
