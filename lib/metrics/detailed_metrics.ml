@@ -685,6 +685,7 @@ let of_five_tuple_flow_metrics
       | Five_tuple_flow_transport_layer_metrics.IPv6 _ -> None
       | Five_tuple_flow_transport_layer_metrics.GRE _ -> None
       | Five_tuple_flow_transport_layer_metrics.ICMPv6 _ -> None
+      | Five_tuple_flow_transport_layer_metrics.Other _ -> None
     in
     let tcp_metrics_option =
       match five_tuple_flow_metrics.Five_tuple_flow_metrics.five_tuple_flow_transport_layer_metrics with
@@ -708,6 +709,7 @@ let of_five_tuple_flow_metrics
       | Five_tuple_flow_transport_layer_metrics.IPv6 _ -> None
       | Five_tuple_flow_transport_layer_metrics.GRE _ -> None
       | Five_tuple_flow_transport_layer_metrics.ICMPv6 _ -> None
+      | Five_tuple_flow_transport_layer_metrics.Other _ -> None
     in
     let udp_metrics_option =
       match five_tuple_flow_metrics.Five_tuple_flow_metrics.five_tuple_flow_transport_layer_metrics with
@@ -727,6 +729,7 @@ let of_five_tuple_flow_metrics
       | Five_tuple_flow_transport_layer_metrics.IPv6 _ -> None
       | Five_tuple_flow_transport_layer_metrics.GRE _ -> None
       | Five_tuple_flow_transport_layer_metrics.ICMPv6 _ -> None
+      | Five_tuple_flow_transport_layer_metrics.Other _ -> None
     in
     let ipv6_metrics_option =
       match five_tuple_flow_metrics.Five_tuple_flow_metrics.five_tuple_flow_transport_layer_metrics with
@@ -740,6 +743,7 @@ let of_five_tuple_flow_metrics
           )
       | Five_tuple_flow_transport_layer_metrics.GRE _ -> None
       | Five_tuple_flow_transport_layer_metrics.ICMPv6 _ -> None
+      | Five_tuple_flow_transport_layer_metrics.Other _ -> None
     in
     let gre_metrics_option =
       match five_tuple_flow_metrics.Five_tuple_flow_metrics.five_tuple_flow_transport_layer_metrics with
@@ -753,6 +757,7 @@ let of_five_tuple_flow_metrics
              five_tuple_flow_gre_metrics.Five_tuple_flow_gre_metrics.nb_packets
           )
       | Five_tuple_flow_transport_layer_metrics.ICMPv6 _ -> None
+      | Five_tuple_flow_transport_layer_metrics.Other _ -> None
     in
     let icmpv6_metrics_option =
       match five_tuple_flow_metrics.Five_tuple_flow_metrics.five_tuple_flow_transport_layer_metrics with
@@ -763,6 +768,7 @@ let of_five_tuple_flow_metrics
       | Five_tuple_flow_transport_layer_metrics.GRE _ -> None
       | Five_tuple_flow_transport_layer_metrics.ICMPv6 icmpv6_metrics ->
         Some (Icmpv6_metrics.copy icmpv6_metrics)
+      | Five_tuple_flow_transport_layer_metrics.Other _ -> None
     in
 
     let t =
@@ -1032,6 +1038,8 @@ let update_five_tuple_flow_metrics
 
           t.icmpv6_metrics_option <- Some new_icmpv6_metrics
         )
+      | Five_tuple_flow_transport_layer_metrics.Other _ ->
+        ()
     );
 
     if !use_verification then
@@ -1243,7 +1251,7 @@ let update_packet_data_for_metrics
     if !use_verification then
       verify "" t;
 
-    assert(false);
+    failwith "[Detailed_metrics]: update_packet_data_for_metrics: DO NOT USE"
   )
 
 let to_indice_name_tuple_array _ =
