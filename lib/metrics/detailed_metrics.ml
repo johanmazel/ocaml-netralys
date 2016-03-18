@@ -37,6 +37,7 @@ type t =
     mutable ipv6_metrics_option : Ipv6_metrics.t option;
     mutable gre_metrics_option : Gre_metrics.t option;
     mutable icmpv6_metrics_option : Icmpv6_metrics.t option;
+    mutable other_protocol_metrics_option : Other_protocol_metrics.t option;
   }
 with compare, sexp
 
@@ -63,6 +64,7 @@ let new_t
     ipv6_metrics_option
     gre_metrics_option
     icmpv6_metrics_option
+    other_protocol_metrics_option
   =
   {
     timestamp_sec_start;
@@ -87,6 +89,7 @@ let new_t
     ipv6_metrics_option;
     gre_metrics_option;
     icmpv6_metrics_option;
+    other_protocol_metrics_option;
   }
 
 let new_empty_t () =
@@ -133,7 +136,7 @@ let to_string
   let time_end = Core.Time.add Core.Time.epoch span_end in
 
   sprintf
-    "%d.%d (%s)\n%d.%d (%s)\nnb_packets: %d\nnb_bytes: %d\npacket_fingerprint: %s\nsrc_addr: %s\ndst_addr: %s\ntransport_portocol: %s\n%s\n%s\n%s\n%s\n%s\n%s"
+    "%d.%d (%s)\n%d.%d (%s)\nnb_packets: %d\nnb_bytes: %d\npacket_fingerprint: %s\nsrc_addr: %s\ndst_addr: %s\ntransport_portocol: %s\n%s\n%s\n%s\n%s\n%s\n%s\n%s"
     t.timestamp_sec_start
     t.timestamp_usec_start
     (Core.Time.to_string_trimmed ~zone: Core.Time.Zone.local time_start)
@@ -170,6 +173,10 @@ let to_string
     (match t.icmpv6_metrics_option with
      | None -> ""
      | Some icmpv6_metrics -> "ICMPv6:\n" ^ Icmpv6_metrics.to_string icmpv6_metrics ^ "\n"
+    )
+    (match t.other_protocol_metrics_option with
+     | None -> ""
+     | Some other_protocol_metrics -> "ICMPv6:\n" ^ Other_protocol_metrics.to_string other_protocol_metrics ^ "\n"
     )
  
 let verify error_string t =
@@ -309,6 +316,12 @@ let verify error_string t =
          (fun icmpv6_metrics -> Icmpv6_metrics.get_nb_packets icmpv6_metrics)
          0
          t.icmpv6_metrics_option
+      )
+      +
+      (Batteries.Option.map_default
+         (fun other_protocol_metrics -> other_protocol_metrics.Other_protocol_metrics.nb_packets)
+         0
+         t.other_protocol_metrics_option
       )
     in
     if nb_transport_layer_packet <> t.nb_packets then
@@ -576,6 +589,12 @@ let fusion
         t1.icmpv6_metrics_option
         t2.icmpv6_metrics_option
     in
+    let other_protocol_metrics_option =
+      Option_utils.fusion
+        Other_protocol_metrics.fusion
+        t1.other_protocol_metrics_option
+        t2.other_protocol_metrics_option
+    in
 
     let new_t_ =
       new_t
@@ -600,6 +619,7 @@ let fusion
         ipv6_metrics_option
         gre_metrics_option
         icmpv6_metrics_option
+        other_protocol_metrics_option
     in
 
     if !use_verification then
@@ -770,6 +790,20 @@ let of_five_tuple_flow_metrics
         Some (Icmpv6_metrics.copy icmpv6_metrics)
       | Five_tuple_flow_transport_layer_metrics.Other _ -> None
     in
+    let other_protocol_metrics_option =
+      match five_tuple_flow_metrics.Five_tuple_flow_metrics.five_tuple_flow_transport_layer_metrics with
+      | Five_tuple_flow_transport_layer_metrics.ICMP _ -> None
+      | Five_tuple_flow_transport_layer_metrics.TCP _ -> None
+      | Five_tuple_flow_transport_layer_metrics.UDP _ -> None
+      | Five_tuple_flow_transport_layer_metrics.IPv6 _ -> None
+      | Five_tuple_flow_transport_layer_metrics.GRE _ -> None
+      | Five_tuple_flow_transport_layer_metrics.ICMPv6 _ -> None
+      | Five_tuple_flow_transport_layer_metrics.Other five_tuple_flow_other_protocol_metrics ->
+        Some
+          (Other_protocol_metrics.new_t
+             five_tuple_flow_other_protocol_metrics.Five_tuple_flow_other_protocol_metrics.nb_packets
+          )
+    in
 
     let t =
       new_t
@@ -794,6 +828,7 @@ let of_five_tuple_flow_metrics
         ipv6_metrics_option
         gre_metrics_option
         icmpv6_metrics_option
+        other_protocol_metrics_option
     in
 
     if !use_verification then
@@ -1038,8 +1073,23 @@ let update_five_tuple_flow_metrics
 
           t.icmpv6_metrics_option <- Some new_icmpv6_metrics
         )
-      | Five_tuple_flow_transport_layer_metrics.Other _ ->
-        ()
+      | Five_tuple_flow_transport_layer_metrics.Other current_five_tuple_flow_other_protocol_metrics ->
+          let current_other_protocol_metrics =
+            Other_protocol_metrics.new_t
+              current_five_tuple_flow_other_protocol_metrics.Five_tuple_flow_other_protocol_metrics.nb_packets
+          in
+
+          let new_other_protocol_metrics =
+            match t.other_protocol_metrics_option with
+            | None ->
+              current_other_protocol_metrics
+            | Some other_protocol_metrics ->
+              Other_protocol_metrics.fusion
+                other_protocol_metrics
+                current_other_protocol_metrics
+          in
+
+          t.other_protocol_metrics_option <- Some new_other_protocol_metrics        
     );
 
     if !use_verification then
@@ -1095,7 +1145,7 @@ let update_packet_data_for_metrics
     t.nb_packets <- t.nb_packets + 1;
 
     t.nb_bytes <- t.nb_bytes + packet_data_for_metrics.Packet_data_for_metrics.length;
-    
+
     let packet_fingerprint =
       Packet_fingerprint.of_packet_data_for_metrics
         packet_data_for_metrics
@@ -1192,7 +1242,17 @@ let update_packet_data_for_metrics
 
               t.gre_metrics_option <- Some gre_metrics;
             )
-          | Ipv4_data_for_metrics.Other protocol_number -> ()
+          | Ipv4_data_for_metrics.Other other_protocol_metrics ->
+            let other_protocol_metrics = 
+              match t.other_protocol_metrics_option with
+              | None -> 
+                Other_protocol_metrics.new_empty_t ()
+              | Some other_protocol_metrics -> other_protocol_metrics
+            in
+
+            Other_protocol_metrics.update other_protocol_metrics;
+
+            t.other_protocol_metrics_option <- Some other_protocol_metrics;
         )
       | Packet_data_for_metrics.IPV6 ipv6_for_metrics ->
         (
