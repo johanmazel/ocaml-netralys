@@ -42,6 +42,8 @@ let to_string t =
 let to_filename_prefix t = 
   "flow_" ^ (to_string t)
 
+exception Not_IP
+
 let of_packet_data_for_metrics
     packet_data_for_metrics
   =
@@ -175,8 +177,9 @@ let of_packet_data_for_metrics
             (*      code *)
             (*   ) *)
       )
-    | Packet_data_for_metrics.Other -> 
-      failwith "Five_tuple_flow: of_packet_data_for_metrics: not IPV4"
+    | Packet_data_for_metrics.Other ->
+      raise Not_IP
+      (* failwith "Five_tuple_flow: of_packet_data_for_metrics: not IPV4" *)
   )
 
 let to_five_tuple_option
