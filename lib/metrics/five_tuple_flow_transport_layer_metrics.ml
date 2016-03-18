@@ -70,15 +70,15 @@ let verify nb_packets error_string t =
       icmpv6_metrics
   | Other code -> ()
       
-let to_int_ t = 
-  match t with
-  | ICMP _ -> 0
-  | TCP _ -> 1
-  | UDP _ -> 2
-  | IPv6 _ -> 3
-  | GRE _ -> 4
-  | ICMPv6 _ -> 5
-  | Other _ -> -1
+(* let to_int_ t =  *)
+(*   match t with *)
+(*   | ICMP _ -> 0 *)
+(*   | TCP _ -> 1 *)
+(*   | UDP _ -> 2 *)
+(*   | IPv6 _ -> 3 *)
+(*   | GRE _ -> 4 *)
+(*   | ICMPv6 _ -> 5 *)
+(*   | Other _ -> -1 *)
 
 let copy t =
   match t with

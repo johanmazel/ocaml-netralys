@@ -93,31 +93,34 @@ let new_t
   }
 
 let new_empty_t () =
-  new_t
-    0
-    0
-    0
-    0
+  let r : t =
+    new_t
+      0
+      0
+      0
+      0
 
-    0
-    0
-    (* (Int_distribution.C.new_single_t ()) *)
+      0
+      0
+      (* (Int_distribution.C.new_single_t ()) *)
 
-    (Packet_fingerprint_distribution.C.new_single_t ())
+      (Packet_fingerprint_distribution.C.new_single_t ())
 
-    (Ipaddr_distribution.C.new_single_t ())
-    (Ipaddr_distribution.C.new_single_t ())
+      (Ipaddr_distribution.C.new_single_t ())
+      (Ipaddr_distribution.C.new_single_t ())
 
-    (Transport_protocol_for_metrics_distribution.C.new_single_t ())
+      (Transport_protocol_for_metrics_distribution.C.new_single_t ())
 
-    None
-    None
-    None
-    None
-    None
-    None
-    None
-
+      None
+      None
+      None
+      None
+      None
+      None
+      None
+  in
+  r
+    
 let to_string
     t
   =
@@ -137,7 +140,7 @@ let to_string
   let time_end = Core.Time.add Core.Time.epoch span_end in
 
   sprintf
-    "%d.%d (%s)\n%d.%d (%s)\nnb_packets: %d\nnb_bytes: %d\npacket_fingerprint: %s\nsrc_addr: %s\ndst_addr: %s\ntransport_portocol: %s\n%s\n%s\n%s\n%s\n%s\n%s\n%s"
+    "%d.%d (%s)\n%d.%d (%s)\nnb_packets: %d\nnb_bytes: %d\npacket_fingerprint: %s\nsrc_addr: %s\ndst_addr: %s\ntransport_protocol: %s\n%s\n%s\n%s\n%s\n%s\n%s\n%s"
     t.timestamp_sec_start
     t.timestamp_usec_start
     (Core.Time.to_string_trimmed ~zone: Core.Time.Zone.local time_start)
@@ -177,7 +180,7 @@ let to_string
     )
     (match t.other_protocol_metrics_option with
      | None -> ""
-     | Some other_protocol_metrics -> "ICMPv6:\n" ^ Other_protocol_metrics.to_string other_protocol_metrics ^ "\n"
+     | Some other_protocol_metrics -> "Other:\n" ^ Other_protocol_metrics.to_string other_protocol_metrics ^ "\n"
     )
  
 let verify error_string t =
@@ -480,6 +483,13 @@ let append
       )
       t.icmpv6_metrics_option
       t_to_append.icmpv6_metrics_option;
+    Option_utils.append
+      Other_protocol_metrics.append
+      (fun other_protocol_metrics_to_append ->
+         t.other_protocol_metrics_option <- Some (Other_protocol_metrics.copy other_protocol_metrics_to_append)
+      )
+      t.other_protocol_metrics_option
+      t_to_append.other_protocol_metrics_option;
 
 
     if !use_verification then
@@ -601,7 +611,7 @@ let fusion
         t2.other_protocol_metrics_option
     in
 
-    let new_t_ =
+    let r : t =
       new_t
         timestamp_sec_start
         timestamp_usec_start
@@ -628,9 +638,9 @@ let fusion
     in
 
     if !use_verification then
-      verify "" new_t_;
+      verify "" r;
 
-    new_t_
+    r
   )
 
 let of_five_tuple_flow_metrics
