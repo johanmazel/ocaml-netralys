@@ -116,6 +116,7 @@ let new_empty_t () =
     None
     None
     None
+    None
 
 let to_string
     t
@@ -348,6 +349,7 @@ let get_dst_address_list t =
     t.dst_addr
 
 let copy t =
+  let r : t =
   new_t
     t.timestamp_sec_start
     t.timestamp_usec_start
@@ -370,6 +372,9 @@ let copy t =
     (Batteries.Option.map Ipv6_metrics.copy t.ipv6_metrics_option)
     (Batteries.Option.map Gre_metrics.copy t.gre_metrics_option)
     (Batteries.Option.map Icmpv6_metrics.copy t.icmpv6_metrics_option)
+    (Batteries.Option.map Other_protocol_metrics.copy t.other_protocol_metrics_option)
+  in
+  r
 
 let append
     t
