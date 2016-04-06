@@ -1,5 +1,5 @@
 
-let env = Mpl_stdlib.new_env (String.make 10000 '\000');;
+let env = Mpl_stdlib.new_env (String.make 1000000 '\000');;
 
 let launch_function_on_header_ethernet
     function_to_apply
