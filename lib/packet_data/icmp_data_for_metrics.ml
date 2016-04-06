@@ -6,13 +6,10 @@ open Icmp
 
 type t =
 | Echo_reply
-(* | Destination_unreachable of (int * int32 * int32 * Icmp_transport_layer_data_for_metrics.t) *)
 | Destination_unreachable of (int * Ipaddr.t * Ipaddr.t * Icmp_transport_layer_data_for_metrics.t)
 | Source_quench
-(* | Redirect_message of (int * int32 * int32 * Icmp_transport_layer_data_for_metrics.t) *)
 | Redirect_message of (int * Ipaddr.t * Ipaddr.t * Icmp_transport_layer_data_for_metrics.t)
 | Echo_request
-(* | Time_exceeded of (int * int32 * int32 * Icmp_transport_layer_data_for_metrics.t) *)
 | Time_exceeded of (int * Ipaddr.t * Ipaddr.t * Icmp_transport_layer_data_for_metrics.t)
 | Timestamp_request
 | Timestamp_reply
@@ -21,21 +18,6 @@ type t =
 | Router_advertisement
 | Router_solicitation
 | Other
-
-(* type t =                         *)
-(*   {                              *)
-(*     echo_request : bool;         *)
-(*     echo_reply : bool;           *)
-(*   }                              *)
-
-(* let new_t                        *)
-(*     echo_request                 *)
-(*     echo_reply                   *)
-(* =                                *)
-(*   {                              *)
-(*     echo_request = echo_request; *)
-(*     echo_reply = echo_reply;     *)
-(*   }                              *)
 
 let of_melange icmp =
   match icmp with
