@@ -184,23 +184,23 @@ let of_packet_data_for_metrics
 
 let to_five_tuple_option
     t
-    =
+  =
   (Some t.src_addr)
-    ,
+  ,
   (Some t.dst_addr)
-    ,
+  ,
   (Some  t.protocol)
-    , 
+  , 
   (if t.src_port = 0 then
-      None
+     None
    else
-      Some t.src_port
+     Some t.src_port
   )
-    , 
+  , 
   (if t.dst_port =0 then
-      None
+     None
    else
-      Some t.dst_port
+     Some t.dst_port
   )
   
 let to_five_tuple
