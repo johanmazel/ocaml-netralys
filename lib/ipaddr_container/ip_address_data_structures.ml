@@ -1546,6 +1546,137 @@ struct
         r_min, r_max
       )
 
+    let interval_overlap
+        start_1
+        end_1
+        start_2
+        end_2
+      =
+      let start_2_is_between_start_end_1 =
+        start_1 <= start_2
+        &&
+        start_2 <= end_1
+      in
+
+      let end_2_is_between_start_end_1 =
+        start_1 <= end_2
+        &&
+        end_2 < end_1
+      in
+
+      let diff_start_1_new_start_2 =
+        start_1
+        -
+        start_2
+      in
+      let diff_end_1_new_end_2 =
+        end_1
+        -
+        end_2
+      in
+
+      let overlap =
+        start_2_is_between_start_end_1
+        || 
+        end_2_is_between_start_end_1
+      in
+
+      let inclusion_1_in_2 =
+        (not start_2_is_between_start_end_1 && not end_2_is_between_start_end_1)
+        &&
+        (diff_start_1_new_start_2 > 0)
+        &&
+        (diff_end_1_new_end_2 < 0)
+      in
+
+      overlap || inclusion_1_in_2
+    
+    let overlap_percentage
+        s1
+        e1
+        s2
+        e2
+      =
+      (
+        let smin = min s1 s2 in
+        (* let smax = max s1 s2 in *)
+        (* let emin = min e1 e2 in *)
+        let emax = max e1 e2 in
+
+        let omin = max s1 s2 in
+        let omax = min e1 e2 in
+
+        (* let len1 = e1 - s1 + 1 in *)
+        (* let len2 = e2 - s2 + 1 in *)
+
+        let len = emax - smin + 1 in
+
+        (* let min x y = if compare x y <= 0 then x else y in *)
+        (* let max x y = if compare x y >= 0 then x else y in *)
+        (* match t1,t2 with *)
+        (* | Empty, _ | _, Empty -> Empty *)
+        (* | Interval (l1,h1), Interval (l2,h2) -> *)
+        (*   create (max l1 l2) (min h1 h2) *)
+
+        let r =
+          if omin > omax then
+            0.
+          else
+            float_of_int (omax - omin + 1)
+            /.
+            float_of_int len
+        in
+
+        r
+      )
+
+    let overlap
+        t1
+        t2
+      =
+      (
+        debug "overlap: call";
+
+        let min_1 =
+          Unsigned_int.to_int
+            (Unsigned_int_set.min_elt
+               t1.data
+            )
+        in
+        let max_1 =
+          Unsigned_int.to_int
+            (Unsigned_int_set.max_elt
+               t1.data
+            )
+        in
+
+        let min_2 =
+          Unsigned_int.to_int
+            (Unsigned_int_set.min_elt
+               t2.data
+            )
+        in
+        let max_2 =
+          Unsigned_int.to_int
+            (Unsigned_int_set.max_elt
+               t2.data
+            )
+        in
+
+        let r =
+          (* interval_overlap *)
+          overlap_percentage
+            min_1
+            max_1
+            min_2
+            max_2
+        in
+
+        debug "overlap: end";
+
+        r
+      )
+
   end
 
   module Container_special = struct

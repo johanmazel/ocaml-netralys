@@ -295,3 +295,15 @@ let relative_position t1 t2 =
   | V6 a, Empty -> raise (Invalid_argument "[Ip_address_container]: relative_position: IPv6 and Empty")
   | V4 _, V6 _ -> raise (Invalid_argument "[Ip_address_container]: relative_position: IPv4 and IPv6")
   | V6 _, V4 _ -> raise (Invalid_argument "[Ip_address_container]: relative_position: IPv6 and IPv4")
+
+let overlap t1 t2 =
+  match t1,t2 with
+  | Empty, Empty -> 0.
+  | V4 a, V4 b -> Ip_address_data_structures_V4.Container.overlap a b
+  | V6 a, V6 b -> Ip_address_data_structures_V6.Container.overlap a b
+  | Empty, V4 a -> raise (Invalid_argument "[Ip_address_container]: relative_position: Empty and IPv4")
+  | V4 a, Empty -> raise (Invalid_argument "[Ip_address_container]: relative_position: IPv4 and Empty")
+  | Empty, V6 a -> raise (Invalid_argument "[Ip_address_container]: relative_position: Empty and IPv6")
+  | V6 a, Empty -> raise (Invalid_argument "[Ip_address_container]: relative_position: IPv6 and Empty")
+  | V4 _, V6 _ -> raise (Invalid_argument "[Ip_address_container]: relative_position: IPv4 and IPv6")
+  | V6 _, V4 _ -> raise (Invalid_argument "[Ip_address_container]: relative_position: IPv6 and IPv4")
