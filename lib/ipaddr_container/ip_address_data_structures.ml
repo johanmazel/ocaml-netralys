@@ -1,4 +1,4 @@
-
+2
 open Printf
 
 module A = Array_ext
@@ -1492,6 +1492,60 @@ struct
     let prefix_max_size =
       Prefix.max_size
     
+    let relative_position
+        t1
+        t2
+      =
+      (
+        debug "relative_position: call";
+
+        let min_1 = Unsigned_int_set.min_elt t1.data in
+        let max_1 = Unsigned_int_set.max_elt t1.data in
+
+        let min_2 = Unsigned_int_set.min_elt t2.data in
+        let max_2 = Unsigned_int_set.max_elt t2.data in
+
+        (* assert(min_1 < min_2); *)
+        (* assert(max_1 < max_2); *)
+
+        let delta_1 = Unsigned_int.sub max_1 min_1 in
+        (* let delta_2 = Unsigned_int.sub max_2 min_2 in *)
+
+        let delta_min = Unsigned_int.sub min_2 min_1 in
+        let delta_max = Unsigned_int.sub max_2 max_1 in
+
+        let r_min =
+          (float_of_int
+             (Unsigned_int.to_int
+                delta_min
+             )
+          )
+          /.
+          (float_of_int
+             (Unsigned_int.to_int
+                delta_1
+             )
+          )
+        in
+        let r_max =
+          (float_of_int
+             (Unsigned_int.to_int
+                delta_max
+             )
+          )
+          /.
+          (float_of_int
+             (Unsigned_int.to_int
+                delta_1
+             )
+          )
+        in
+
+        debug "relative_position: end";
+
+        r_min, r_max
+      )
+
   end
 
   module Container_special = struct
@@ -1657,7 +1711,7 @@ struct
                  t.element_subset_set_h
                  element        
              else
-               Int_core_ht.replace
+               Int_core_ht.set
                  t.element_subset_set_h
                  element
                  new_subset_set
@@ -1723,7 +1777,7 @@ struct
                    subset_indice
                in
 
-               Int_core_ht.replace
+               Int_core_ht.set
                  t.element_subset_set_h
                  element
                  new_subset_set;
@@ -1937,7 +1991,7 @@ struct
                      element_indice
                  in
 
-                 Int_core_ht.replace
+                 Int_core_ht.set
                    t.subset_element_set_h
                    subset_indice
                    new_element_indice_set
