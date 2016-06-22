@@ -286,7 +286,7 @@ let nth_bit_zero bit_indice t =
 
 let relative_position t1 t2 =
   match t1,t2 with
-  | Empty, Empty -> 0., 0.
+  | Empty, Empty -> Some (0., 0.)
   | V4 a, V4 b -> Ip_address_data_structures_V4.Container.relative_position a b
   | V6 a, V6 b -> Ip_address_data_structures_V6.Container.relative_position a b
   | Empty, V4 a -> raise (Invalid_argument "[Ip_address_container]: relative_position: Empty and IPv4")
