@@ -1508,7 +1508,7 @@ struct
         (* assert(start_1 < start_2); *)
         (* assert(end_1 < end_2); *)
 
-        if start_1 < start_2 then
+        if start_1 > start_2 then
           (
             print_endline
               (sprintf
@@ -1532,7 +1532,7 @@ struct
               );
             assert(false);
           );
-        if end_1 < end_2 then
+        if end_1 > end_2 then
           (
             print_endline
               (sprintf
