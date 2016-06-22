@@ -1496,25 +1496,24 @@ struct
         t1
         t2
       =
-      (
+      (        
         debug "relative_position: call";
 
-        let min_1 = Unsigned_int_set.min_elt t1.data in
-        let max_1 = Unsigned_int_set.max_elt t1.data in
+        let start_1 = Unsigned_int_set.min_elt t1.data in
+        let end_1 = Unsigned_int_set.max_elt t1.data in
 
-        let min_2 = Unsigned_int_set.min_elt t2.data in
-        let max_2 = Unsigned_int_set.max_elt t2.data in
+        let start_2 = Unsigned_int_set.min_elt t2.data in
+        let end_2 = Unsigned_int_set.max_elt t2.data in
 
-        (* assert(min_1 < min_2); *)
-        (* assert(max_1 < max_2); *)
+        assert(start_1 < start_2);
+        assert(end_1 < end_2);
 
-        let delta_1 = Unsigned_int.sub max_1 min_1 in
-        (* let delta_2 = Unsigned_int.sub max_2 min_2 in *)
+        let delta_1 = Unsigned_int.sub end_1 start_1 in
 
-        let delta_min = Unsigned_int.sub min_2 min_1 in
-        let delta_max = Unsigned_int.sub max_2 max_1 in
+        let delta_min = Unsigned_int.sub start_2 start_1 in
+        let delta_max = Unsigned_int.sub end_2 start_1 in
 
-        let r_min =
+        let rp_start =
           (float_of_int
              (Unsigned_int.to_int
                 delta_min
@@ -1527,7 +1526,7 @@ struct
              )
           )
         in
-        let r_max =
+        let rp_end =
           (float_of_int
              (Unsigned_int.to_int
                 delta_max
@@ -1543,7 +1542,7 @@ struct
 
         debug "relative_position: end";
 
-        r_min, r_max
+        rp_start, rp_end
       )
 
     let interval_overlap
