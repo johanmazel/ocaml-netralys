@@ -1513,11 +1513,15 @@ struct
             print_endline
               (sprintf
                  "[Ip_address_data_structures]: relative_position: start: %s > %s"
-                 (Ip_address.of_unsigned_int
-                    start_1
+                 (Ip_address.to_string
+                    (Ip_address.of_unsigned_int
+                       start_1
+                    )
                  )
-                 (Ip_address.of_unsigned_int
-                    start_2
+                 (Ip_address.to_string
+                    (Ip_address.of_unsigned_int
+                       start_2
+                    )
                  )
               );
             assert(false);
@@ -1527,11 +1531,15 @@ struct
             print_endline
               (sprintf
                  "[Ip_address_data_structures]: relative_position: end: %s > %s"
-                 (Ip_address.of_unsigned_int
-                    end_1
+                 (Ip_address.to_string
+                    (Ip_address.of_unsigned_int
+                       end_1
+                    )
                  )
-                 (Ip_address.of_unsigned_int
-                    end_2
+                 (Ip_address.to_string
+                    (Ip_address.of_unsigned_int
+                       end_2
+                    )
                  )
               );
             assert(false);
