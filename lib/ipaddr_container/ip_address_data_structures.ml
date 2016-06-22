@@ -1505,8 +1505,37 @@ struct
         let start_2 = Unsigned_int_set.min_elt t2.data in
         let end_2 = Unsigned_int_set.max_elt t2.data in
 
-        assert(start_1 < start_2);
-        assert(end_1 < end_2);
+        (* assert(start_1 < start_2); *)
+        (* assert(end_1 < end_2); *)
+
+        if start_1 < start_2 then
+          (
+            print_endline
+              (sprintf
+                 "[Ip_address_data_structures]: relative_position: start: %s > %s"
+                 (Ip_address.of_unsigned_int
+                    start_1
+                 )
+                 (Ip_address.of_unsigned_int
+                    start_2
+                 )
+              );
+            assert(false);
+          );
+        if end_1 < end_2 then
+          (
+            print_endline
+              (sprintf
+                 "[Ip_address_data_structures]: relative_position: end: %s > %s"
+                 (Ip_address.of_unsigned_int
+                    end_1
+                 )
+                 (Ip_address.of_unsigned_int
+                    end_2
+                 )
+              );
+            assert(false);
+          );
 
         let delta_1 = Unsigned_int.sub end_1 start_1 in
 
