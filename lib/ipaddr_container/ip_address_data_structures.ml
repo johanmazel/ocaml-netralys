@@ -1499,71 +1499,72 @@ struct
       (        
         debug "relative_position: call";
 
-        let start_1 = Unsigned_int_set.min_elt t1.data in
-        let end_1 = Unsigned_int_set.max_elt t1.data in
+        let min_1 = Unsigned_int_set.min_elt t1.data in
+        let max_1 = Unsigned_int_set.max_elt t1.data in
 
-        let start_2 = Unsigned_int_set.min_elt t2.data in
-        let end_2 = Unsigned_int_set.max_elt t2.data in
+        let min_2 = Unsigned_int_set.min_elt t2.data in
+        let max_2 = Unsigned_int_set.max_elt t2.data in
 
         let opt =
-          if end_1 < start_2 || end_2 < start_1 then
+          (* We ensure that there is no overlap. *)
+          if max_1 < min_2 || max_2 < min_1 then
             (
               (* assert(start_1 < start_2); *)
               (* assert(end_1 < end_2); *)
 
-              if start_1 > start_2 then
-                (
-                  print_endline
-                    (sprintf
-                       "[Ip_address_data_structures]: relative_position: start: %s (%s) > %s (%s)"
-                       (Unsigned_int.to_string
-                          start_1
-                       )
-                       (Ip_address.to_string
-                          (Ip_address.of_unsigned_int
-                             start_1
-                          )
-                       )
-                       (Unsigned_int.to_string
-                          start_2
-                       )
-                       (Ip_address.to_string
-                          (Ip_address.of_unsigned_int
-                             start_2
-                          )
-                       )
-                    );
-                  assert(false);
-                );
-              if end_1 > end_2 then
-                (
-                  print_endline
-                    (sprintf
-                       "[Ip_address_data_structures]: relative_position: end: %s (%s) > %s (%s)"
-                       (Unsigned_int.to_string
-                          end_1
-                       )
-                       (Ip_address.to_string
-                          (Ip_address.of_unsigned_int
-                             end_1
-                          )
-                       )
-                       (Unsigned_int.to_string
-                          end_2
-                       )
-                       (Ip_address.to_string
-                          (Ip_address.of_unsigned_int
-                             end_2
-                          )
-                       )
-                    );
-                  assert(false);
-                );
+              (* if start_1 > start_2 then *)
+              (*   ( *)
+              (*     print_endline *)
+              (*       (sprintf *)
+              (*          "[Ip_address_data_structures]: relative_position: start: %s (%s) > %s (%s)" *)
+              (*          (Unsigned_int.to_string *)
+              (*             start_1 *)
+              (*          ) *)
+              (*          (Ip_address.to_string *)
+              (*             (Ip_address.of_unsigned_int *)
+              (*                start_1 *)
+              (*             ) *)
+              (*          ) *)
+              (*          (Unsigned_int.to_string *)
+              (*             start_2 *)
+              (*          ) *)
+              (*          (Ip_address.to_string *)
+              (*             (Ip_address.of_unsigned_int *)
+              (*                start_2 *)
+              (*             ) *)
+              (*          ) *)
+              (*       ); *)
+              (*     assert(false); *)
+              (*   ); *)
+              (* if end_1 > end_2 then *)
+              (*   ( *)
+              (*     print_endline *)
+              (*       (sprintf *)
+              (*          "[Ip_address_data_structures]: relative_position: end: %s (%s) > %s (%s)" *)
+              (*          (Unsigned_int.to_string *)
+              (*             end_1 *)
+              (*          ) *)
+              (*          (Ip_address.to_string *)
+              (*             (Ip_address.of_unsigned_int *)
+              (*                end_1 *)
+              (*             ) *)
+              (*          ) *)
+              (*          (Unsigned_int.to_string *)
+              (*             end_2 *)
+              (*          ) *)
+              (*          (Ip_address.to_string *)
+              (*             (Ip_address.of_unsigned_int *)
+              (*                end_2 *)
+              (*             ) *)
+              (*          ) *)
+              (*       ); *)
+              (*     assert(false); *)
+              (*   ); *)
 
-              let delta_1 = Unsigned_int.sub end_1 start_1 in
+              let delta_1 = Unsigned_int.sub max_1 min_1 in
 
-              let delta_min = Unsigned_int.sub start_2 start_1 in
-              let delta_max = Unsigned_int.sub end_2 start_1 in
+              let delta_min = Unsigned_int.sub min_2 min_1 in
+              let delta_max = Unsigned_int.sub max_2 min_1 in
 
               let rp_start =
                 (float_of_int
