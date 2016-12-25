@@ -19,7 +19,7 @@ module Ipaddr_distribution = Key_occurrence_distribution.Make(Admd_ipaddr_custom
 module Transport_protocol_for_metrics_ =
 struct
   type t = Transport_protocol_for_metrics.t
-  with sexp, bin_io
+  [@@deriving sexp, bin_io]
 
   let compare = Transport_protocol_for_metrics.compare
   let to_float t = float_of_int (Transport_protocol_for_metrics.to_int t)

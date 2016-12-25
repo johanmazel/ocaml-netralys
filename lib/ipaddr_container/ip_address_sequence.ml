@@ -8,7 +8,7 @@ type t =
   | Empty
   | V4 of Ip_address_data_structures_V4.Sequence.t
   | V6 of Ip_address_data_structures_V6.Sequence.t
-with compare, sexp, bin_io
+[@@deriving compare, sexp, bin_io]
 
 let to_string t =
   match t with

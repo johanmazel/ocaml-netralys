@@ -12,7 +12,7 @@ type t =
 | GRE
 | ICMPv6
 | Other of int
-with compare, sexp, bin_io
+[@@deriving compare, sexp, bin_io]
 
 let of_string string =
   match string with

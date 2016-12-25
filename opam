@@ -34,6 +34,10 @@ depends: [
   "uint"
   "gsl"
 
+  "ppx_compare"
+  "ppx_sexp_conv"
+  "ppx_bin_prot"
+
   "ocaml-jl"
   "ocaml-robinet_parsing"
   "ocaml-admd"

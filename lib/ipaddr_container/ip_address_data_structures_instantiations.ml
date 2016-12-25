@@ -4,7 +4,7 @@ open Bin_prot.Std
 
 module Bin_int_V4 = struct
   type t = Core.Std.Int32.t
-  with compare, sexp, bin_io
+  [@@deriving compare, sexp, bin_io]
 
   let of_int32 int32 = int32
   let of_int64_tuple _ = raise (Invalid_argument "Cannot build V4 from two int64")
@@ -22,7 +22,7 @@ module Unsigned_int_V4 = struct
   module Bin_int = Bin_int_V4
   
   type t = Uint32.t
-  with compare
+  [@@deriving compare]
 
   (* let compare_unsigned_int = Uint32.compare *)
   let to_string = Uint32.to_string
@@ -44,7 +44,7 @@ module Ip_address_V4 = struct
   module Unsigned_int = Unsigned_int_V4
     
   type t = Ipaddr.V4.t
-  with compare
+  [@@deriving compare]
     
   let null = Ipaddr.V4.of_int32 (Int32.zero)
   let of_bin_int int32 = Ipaddr.V4.of_int32 int32
@@ -84,7 +84,7 @@ module Ip_address_data_structures_V4 = Ip_address_data_structures.Make(Bin_int_V
 
 module Bin_int_V6 = struct
   type t = Core.Std.Int64.t * Core.Std.Int64.t
-  with compare, sexp, bin_io
+  [@@deriving compare, sexp, bin_io]
 
   let zero = Int64.zero, Int64.zero
   let one = Int64.zero, Int64.zero
@@ -139,7 +139,7 @@ module Unsigned_int_V6 = struct
   module Bin_int = Bin_int_V6
 
   type t = Uint128_custom.t
-  with compare
+  [@@deriving compare]
 
   (* let compare_unsigned_int = Uint128_custom.compare *)
   let compare = Uint128_custom.compare
@@ -165,7 +165,7 @@ module Ip_address_V6 = struct
   module Unsigned_int = Unsigned_int_V6
     
   type t = Ipaddr.V6.t
-  with compare
+  [@@deriving compare]
     
   let null = Ipaddr.V6.of_int64 (Int64.zero, Int64.zero)
   let of_bin_int

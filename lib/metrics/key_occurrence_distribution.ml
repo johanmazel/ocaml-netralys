@@ -36,7 +36,7 @@ module Make = functor (Key : KEY) -> struct
     include Core_kernel.Core_map.Make(
       struct
         type t = Key.t
-        with sexp, bin_io
+        [@@deriving sexp, bin_io]
 
         let compare = Key.compare
         let to_string = Key.to_string
@@ -67,7 +67,7 @@ module Make = functor (Key : KEY) -> struct
       {
         hashtable : (Key.t, 'a) Core.Std.Hashtbl.Poly.t;
       }
-    with sexp, bin_io
+    [@@deriving sexp, bin_io]
 
     let new_t hashtable = { hashtable }
 
@@ -319,7 +319,7 @@ module Make = functor (Key : KEY) -> struct
       {
         value_container_hashtable : int Container.t;
       }
-    with sexp, bin_io
+    [@@deriving sexp, bin_io]
 
     let new_t
         value_container_hashtable
@@ -1880,7 +1880,7 @@ module Make = functor (Key : KEY) -> struct
         key_array : Key.t array;
         occurrence_array : int array;
       }
-    with compare, sexp, bin_io
+    [@@deriving compare, sexp, bin_io]
          
     let new_t
         key_array

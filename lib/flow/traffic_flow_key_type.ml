@@ -21,7 +21,7 @@ type aggr_t =
   | Src_addr of Ipaddr.t
   | Dst_addr of Ipaddr.t
   | All
-with compare
+[@@deriving compare]
 
 let to_string_aggr t = 
   match t with
@@ -46,24 +46,6 @@ let of_aggr_mode_simple_key
       (* (Ipaddr.V4.to_int32 (Ipaddr.to_v4 simple_key.Five_tuple_flow.dst_addr)) *)
       simple_key.Five_tuple_flow.dst_addr
   | All_mode -> All
-
-  (* | Year_aggr_mode -> *)
-  (*   ( *)
-  (*     let year = Core.Date.year simple_key in *)
-  (*     let month = Core.Month.of_int_exn 1 in *)
-  (*     Year_detailed_aggr *)
-  (*   (Core.Date.create_exn year month 1) *)
-  (*   ) *)
-  (* | Month_aggr_mode -> *)
-  (*   ( *)
-  (*     let year = Core.Date.year simple_key in *)
-  (*     let month = Core.Date.month simple_key in *)
-  (*     Month_detailed_aggr *)
-  (*   (Core.Date.create_exn *)
-  (*      year *)
-  (*      month *)
-  (*      1) *)
-  (*   ) *)
 
 let of_aggr_mode_aggr_key 
     aggr_mode
@@ -91,26 +73,5 @@ let of_aggr_mode_aggr_key
       | Dst_addr_mode -> failwith "Time_aggregation_detailed: trying to aggregate from src_addr to all => not possible"
       | All_mode -> failwith "Time_aggregation_detailed: trying to aggregate from all to all => useless"
     )
-
-  (* | Year_detailed_aggr date -> *)
-  (*   ( *)
-  (*     match aggr_mode with *)
-  (*     | All_aggr_mode -> All_detailed_aggr *)
-  (*     | Year_aggr_mode -> failwith "Time_aggregation_detailed: trying to (re)aggregate from year to year => useless" *)
-  (*     | Month_aggr_mode -> failwith "Time_aggregation_detailed: trying to (re)aggregate from year to month" *)
-  (*   ) *)
-  (* | Month_detailed_aggr date -> *)
-  (*   ( *)
-  (*     match aggr_mode with *)
-  (*     | All_aggr_mode -> All_detailed_aggr *)
-  (*     | Year_aggr_mode -> *)
-  (*   ( *)
-  (*     let year = Core.Date.year date in *)
-  (*     let month = Core.Month.of_int_exn 1 in *)
-  (*     Year_detailed_aggr *)
-  (*       (Core.Date.create_exn year month 1) *)
-  (*   ) *)
-  (*     | Month_aggr_mode -> failwith "Time_aggregation_detailed: trying to (re)aggregate from month to month => useless" *)
-  (*   ) *)
 
 let compare_aggr = compare

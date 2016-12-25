@@ -17,7 +17,7 @@ type t =
     src_port : Int_distribution.C.t;
     dst_port : Int_distribution.C.t;
   }
-with compare, sexp
+[@@deriving compare, sexp]
 
 let new_t
     nb_icmp_tcp_packets

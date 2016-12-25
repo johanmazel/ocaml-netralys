@@ -27,7 +27,7 @@ type t =
   {
     map : Value_variant.t Core.Std.Int.Map.t;
   }
-with compare, sexp, bin_io
+[@@deriving compare, sexp, bin_io]
 
 let new_t
     map

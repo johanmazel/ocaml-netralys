@@ -50,10 +50,9 @@ Library netralys_packet_data
                  ipaddr,
                  bitstring,
 
-                 comparelib,
-                 comparelib.syntax,
-                 pa_sexp_conv,
-                 pa_bin_prot,
+                 ppx_compare,
+                 ppx_sexp_conv,
+                 ppx_bin_prot,
 
                  robinet_parsing,
                  admd,
@@ -69,10 +68,9 @@ Library netralys_flow
                  batteries,
                  ipaddr,
 
-                 comparelib,
-                 comparelib.syntax,
-                 pa_sexp_conv,
-                 pa_bin_prot,
+                 ppx_compare,
+                 ppx_sexp_conv,
+                 ppx_bin_prot,
 
                  jl,
                  netralys_packet_data,
@@ -146,10 +144,9 @@ Library netralys_ipaddr_container
                  uint,
                  gsl,
 
-                 comparelib,
-                 comparelib.syntax,
-                 pa_sexp_conv,
-                 pa_bin_prot,
+                 ppx_compare,
+                 ppx_sexp_conv,
+                 ppx_bin_prot,
 
                  jl,
                  netralys_packet_data

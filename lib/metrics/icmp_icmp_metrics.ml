@@ -22,7 +22,7 @@ type t =
 
     icmp_du_code : Int_distribution.C.t;
   }
-with compare, sexp
+[@@deriving compare, sexp]
 
 let new_t
     nb_icmp_icmp_packets

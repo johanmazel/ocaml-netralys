@@ -7,7 +7,7 @@ type t =
   | Empty
   | V4 of Ip_address_data_structures_V4.Container.t
   | V6 of Ip_address_data_structures_V6.Container.t
-with compare
+[@@deriving compare]
 (* with compare, sexp, bin_io *)
 
 let to_string t =

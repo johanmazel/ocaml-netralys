@@ -39,7 +39,7 @@ type t =
     mutable icmpv6_metrics_option : Icmpv6_metrics.t option;
     mutable other_protocol_metrics_option : Other_protocol_metrics.t option;
   }
-with compare, sexp
+[@@deriving compare, sexp]
 
 let new_t
     timestamp_sec_start

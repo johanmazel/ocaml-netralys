@@ -7,7 +7,7 @@ open Bin_prot.Std
 module IntModule =
 struct
   type t = int
-  with sexp, bin_io
+  [@@deriving sexp, bin_io]
 
   let compare = Batteries.Int.compare
   let to_float x = float_of_int x
@@ -24,7 +24,7 @@ module Int_distribution = Key_occurrence_distribution.Make(IntModule)
 
 module Int32Module = struct
   type t = int32
-  with sexp, bin_io
+  [@@deriving sexp, bin_io]
 
   let compare = Int32.compare
   let to_float x = Int32.to_float x
@@ -38,7 +38,7 @@ module Int32_distribution = Key_occurrence_distribution.Make(Int32Module)
 
 module FloatModule = struct
   type t = float
-  with sexp, bin_io
+  [@@deriving sexp, bin_io]
 
   let compare = Batteries.Float.compare
   let to_float (value : float) = value
@@ -51,7 +51,7 @@ module Float_distribution = Key_occurrence_distribution.Make(FloatModule)
 
 module StringModule = struct
   type t = string
-  with sexp, bin_io
+  [@@deriving sexp, bin_io]
 
   let compare = Batteries.String.compare
   let to_float value = 0.0

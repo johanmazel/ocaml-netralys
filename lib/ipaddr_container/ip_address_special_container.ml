@@ -6,8 +6,7 @@ open Ip_address_data_structures_instantiations
 type t =
   | V4 of Ip_address_data_structures_V4.Container_special.t
   | V6 of Ip_address_data_structures_V6.Container_special.t
-(* with compare *)
-with compare, sexp, bin_io
+[@@deriving compare, sexp, bin_io]
   
 (* let length t = *)
 (*   match t with *)

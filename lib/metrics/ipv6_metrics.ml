@@ -7,7 +7,7 @@ type t =
   {
     mutable nb_packets : int;
   }
-with compare, sexp
+[@@deriving compare, sexp]
 
 let new_t
     nb_packets

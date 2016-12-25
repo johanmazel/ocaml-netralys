@@ -20,7 +20,7 @@ type t =
     
     data_length_distribution : Int_distribution.C.t;
   }
-with compare, sexp
+[@@deriving compare, sexp]
 
 let new_t
     nb_udp_packets

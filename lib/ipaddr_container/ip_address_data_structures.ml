@@ -132,7 +132,7 @@ struct
     include Core.Std.Set.Make_binable(
       struct
         type t = Bin_int.t
-        with sexp, bin_io
+        [@@deriving sexp, bin_io]
 
         let compare = Bin_int.compare
         let to_string bin_int =
@@ -167,7 +167,7 @@ struct
     Iset.Make(
     struct
       type t = Bin_int.t
-      with sexp, bin_io
+      [@@deriving sexp, bin_io]
 
       let compare = Bin_int.compare
                       
@@ -382,7 +382,7 @@ struct
       {
         mutable a : Bin_int.t array;
       }
-    with compare, sexp, bin_io
+    [@@deriving compare, sexp, bin_io]
 
     let new_t
         a
@@ -439,7 +439,7 @@ struct
 
         mutable iset : Bin_int_iset.t;
       }
-    with compare, sexp, bin_io
+    [@@deriving compare, sexp, bin_io]
 
     let new_t
         isolated
@@ -685,7 +685,7 @@ struct
       {
         data : Unsigned_int_set.t;
       }
-    with compare
+    [@@deriving compare]
 
     let new_t
         data
@@ -1742,7 +1742,7 @@ struct
     module Int_core_ht = Core_kernel.Core_hashtbl.Make_binable(
       struct
         type t = int
-        with compare, sexp, bin_io
+        [@@deriving compare, sexp, bin_io]
 
         let hash = Hashtbl.hash
 
@@ -1756,7 +1756,7 @@ struct
       )
     
     type subset_h = Bin_int_set.t Int_core_ht.t
-    with sexp, bin_io
+    [@@deriving sexp, bin_io]
 
     let compare_subset_h t1 t2 =
       BatHashtbl_utils.compare
@@ -1765,7 +1765,7 @@ struct
         (BatHashtbl.of_enum (L.enum (Int_core_ht.to_alist t2)))
 
     type subset_element_set_h = Core_kernel.Core_int.Set.t Int_core_ht.t
-    with sexp, bin_io
+    [@@deriving sexp, bin_io]
 
     let compare_subset_element_set_h t1 t2 =
       BatHashtbl_utils.compare      
@@ -1774,7 +1774,7 @@ struct
         (BatHashtbl.of_enum (L.enum (Int_core_ht.to_alist t2)))
 
     type element_subset_set_h = Core_kernel.Core_int.Set.t Int_core_ht.t
-    with sexp, bin_io
+    [@@deriving sexp, bin_io]
 
     let compare_element_subset_set_h t1 t2 =
       BatHashtbl_utils.compare
@@ -1792,7 +1792,7 @@ struct
 
         element_subset_set_h : element_subset_set_h;
       }
-    with compare, sexp, bin_io
+    [@@deriving compare, sexp, bin_io]
 
     let new_t
         current_subset_indice

@@ -19,7 +19,7 @@ type t =
     mutable icmp_du_metrics_option : Icmp_du_metrics.t option;
     mutable icmp_te_metrics_option : Icmp_te_metrics.t option;
   }
-with compare, sexp
+[@@deriving compare, sexp]
 
 let new_t
     icmp_type

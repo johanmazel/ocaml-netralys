@@ -22,7 +22,7 @@ type t =
     mutable icmp_tcp_metrics_option : Icmp_tcp_metrics.t option;
     mutable icmp_udp_metrics_option : Udp_metrics.t option;
   }
-with compare, sexp
+[@@deriving compare, sexp]
 
 let new_t
     src_addr

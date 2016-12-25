@@ -16,7 +16,7 @@ type t =
   {
     mutable nb_packets : int;
   }
-with compare
+[@@deriving compare]
 
 let new_t
     nb_packets

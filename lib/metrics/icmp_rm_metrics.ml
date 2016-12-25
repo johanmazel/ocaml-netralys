@@ -17,7 +17,7 @@ type t =
     mutable nb_packets : int;
     icmp_encapsulated_metrics : Icmp_encapsulated_metrics.t;
   }
-with compare, sexp
+[@@deriving compare, sexp]
 
 let new_t
     nb_packets

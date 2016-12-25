@@ -23,7 +23,7 @@ type t =
     name_int_map : string Core.Std.Int.Map.t;
     indice_string_map : int Core.Std.String.Map.t;
   }
-with compare, sexp, bin_io
+[@@deriving compare, sexp, bin_io]
 
 let new_t
     name_int_map

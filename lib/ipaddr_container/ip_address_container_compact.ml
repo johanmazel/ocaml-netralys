@@ -7,7 +7,7 @@ type t =
   | Empty
   | V4 of Ip_address_data_structures_V4.Container_compact.t
   | V6 of Ip_address_data_structures_V6.Container_compact.t
-with compare, sexp, bin_io
+[@@deriving compare, sexp, bin_io]
 
 (* let of_ipaddr_list ipaddr_list = *)
 (*   assert(L.length ipaddr_list > 0); *)

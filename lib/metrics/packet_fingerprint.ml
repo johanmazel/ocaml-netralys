@@ -8,7 +8,7 @@ type t =
   | Zmap
   | Masscan
   | Zmap_masscan
-with compare, sexp, bin_io
+[@@deriving compare, sexp, bin_io]
 
 let to_int t =
   match t with
@@ -154,16 +154,3 @@ let of_packet_data_for_metrics
 let default_value () = None
 
 let to_float t = float_of_int (to_int t)
-
-(* let hash = Hashtbl.hash *)
-
-(* let min = return_null_value () *)
-(* let max = return_null_value () *)
-
-(* let pred t = t *)
-(* let succ t = t *)
-
-(* let sub t1 t2 = *)
-(*   Batteries.Int.sub *)
-(*     (to_int t1) *)
-(*     (to_int t2) *)

@@ -24,7 +24,7 @@ type t =
     mutable nb_syn_packets : int;
     mutable nb_fin_packets : int;
   }
-with compare, sexp
+[@@deriving compare, sexp]
 
 let new_t
     nb_tcp_packets

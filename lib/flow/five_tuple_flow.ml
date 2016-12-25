@@ -13,7 +13,7 @@ type t =
     src_port : int;
     dst_port : int;
   }
-with compare
+[@@deriving compare]
 
 let new_t 
     src_addr
