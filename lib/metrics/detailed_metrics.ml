@@ -11,6 +11,8 @@ open Sexplib.Std
 open Key_occurrence_distribution_instantiations
 open Network_traffic_metric_instantiations
 
+exception Five_tuple_flow_timestamp_error
+  
 let use_verification = ref false
     
 type t =
@@ -667,8 +669,19 @@ let of_five_tuple_flow_metrics
       &&      
       (five_tuple_flow_metrics.Five_tuple_flow_metrics.timestamp_usec_start =
        five_tuple_flow_metrics.Five_tuple_flow_metrics.timestamp_usec_end)
+      &&
+      (five_tuple_flow_metrics.Five_tuple_flow_metrics.nb_packets > 1)
     then
-      assert(five_tuple_flow_metrics.Five_tuple_flow_metrics.nb_packets = 1);
+      (
+        print_endline
+          (sprintf
+             "[Detailed_metrics]: of_five_tuple_flow_metrics: more than 1 packet with the same timestamp:\n%s\n\n%s\n\n"
+             (Five_tuple_flow.to_string five_tuple_flow)
+             (Five_tuple_flow_metrics.to_string five_tuple_flow_metrics)
+          );
+
+        raise Five_tuple_flow_timestamp_error
+      );
 
     let nb_packets = five_tuple_flow_metrics.Five_tuple_flow_metrics.nb_packets in
     let nb_bytes = five_tuple_flow_metrics.Five_tuple_flow_metrics.nb_bytes in
