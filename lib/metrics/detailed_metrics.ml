@@ -646,6 +646,7 @@ let fusion
   )
 
 let of_five_tuple_flow_metrics
+    ?(check_five_tuple_flow_metrics_timestamp = true)
     five_tuple_flow
     five_tuple_flow_metrics
   =
@@ -664,6 +665,8 @@ let of_five_tuple_flow_metrics
         five_tuple_flow_metrics;
 
     if
+      check_five_tuple_flow_metrics_timestamp
+      &&
       (five_tuple_flow_metrics.Five_tuple_flow_metrics.timestamp_sec_start =
        five_tuple_flow_metrics.Five_tuple_flow_metrics.timestamp_sec_end)
       &&      
@@ -685,7 +688,7 @@ let of_five_tuple_flow_metrics
 
     let nb_packets = five_tuple_flow_metrics.Five_tuple_flow_metrics.nb_packets in
     let nb_bytes = five_tuple_flow_metrics.Five_tuple_flow_metrics.nb_bytes in
-    
+
     let packet_fingerprint_distribution =
       Packet_fingerprint_distribution.C.copy
         five_tuple_flow_metrics.Five_tuple_flow_metrics.packet_fingerprint_distribution
@@ -842,7 +845,7 @@ let of_five_tuple_flow_metrics
 
         nb_packets
         nb_bytes
-      
+
         packet_fingerprint_distribution
 
         src_addr
